@@ -7,8 +7,8 @@ class C_Stage1_Bk:
         self.p_image = load_image('plat_form_1.png')
     def draw(self):
      #   self.image.clip_draw( 0,0,800,600,400-self.scroll_x,300)
-      #  self.image.clip_draw(0, 0, 3376 * 2 , 600, 3376 - self.scroll_x, 300)
-        self.image.clip_draw(0, 0, 3376, 240, 4000, 300 , 8000 , 600)
+        self.image.clip_draw(0, 0, 3376 * 2 , 600, 3376 - self.scroll_x, 300)
+        #self.image.clip_draw(0, 0, 3376, 240, 4000, 300 , 8000 , 600)
 
 
     def update(self,x):

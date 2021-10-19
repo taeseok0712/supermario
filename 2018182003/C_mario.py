@@ -24,10 +24,18 @@ class mario():
         self.jump_height = 0
         self.is_Coll = False
         self.Coll_y = 0
+        self.size_x = 32
+        self.size_y = 32
 
+
+    def get_hitbox(self):
+        return self.x - (self.size_x/2),self.y - (self.size_y/2), self.x + (self.size_x/2),self.y + (self.size_y/2)
     def draw(self):
 
-        self.image.clip_draw(32*self.frame, 192-(32* self.dirction), 32, 32, self.x, self.y)
+        self.image.clip_draw(32*self.frame, 192-(32* self.dirction), self.size_x, self.size_y, self.x, self.y)
+
+        draw_rectangle(*self.get_hitbox())
+
 
     def update(self):
 
@@ -56,6 +64,7 @@ class mario():
                 #점프중
                 if (self.is_Coll):
                     self.Falling = True
+                    self.is_Coll = False
                     self.y = self.Coll_y -32 -self.jump_height
                 self.y += self.jump_height
             if(self.jump_power * self.jump_accel < self.gravity * (self.jump_accel ** 2) * 0.5):
@@ -63,6 +72,7 @@ class mario():
                 if (self.is_Coll):
                     self.Falling = False
                     self.jump_on = False
+                    self.is_Coll = False
                     self.state = state.S_landing
                     self.y = self.Coll_y + 32 +0.5 * self.gravity * self.jump_accel
                 self.y -= 0.5 * self.gravity * self.jump_accel
@@ -80,6 +90,7 @@ class mario():
                 self.state = state.S_landing
                 self.jump_on = False
                 self.Falling = False
+
 
         if(self.jump_on ==False and self.Falling == False):
             self.jump_accel = 0

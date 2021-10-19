@@ -8,6 +8,8 @@ class Block:
         self.type = type
         self.x = x
         self.y = y
+        self.size_x = 32
+        self.size_y = 32
         self.state = state_block.S_Idle
         self.is_coll = False
         self.is_hit = False
@@ -25,9 +27,9 @@ class Block:
     def draw(self):
 
         self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x -self.scroll_x,self.y)
-
-    def draw_1(self,w,h):
-        self.image.clip_draw(32 * self.frame, 32 * self.type_a, 32, 32, self.x - self.scroll_x, self.y,w,h)
+        draw_rectangle(*self.get_hitbox())
+    def get_hitbox(self):
+        return self.x-self.scroll_x - (self.size_x/2),self.y - (self.size_y/2), self.x-self.scroll_x + (self.size_x/2),self.y + (self.size_y/2)
 
     def update(self,scroll_x):
         self.Flame_Change_End = time.time();

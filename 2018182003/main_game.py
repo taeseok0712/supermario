@@ -5,6 +5,7 @@ from C_state import state
 from C_block import Block
 from C_Stage1_Back_Ground import C_Stage1_Bk
 
+
 def Coll_MB():
     global player
     global random_b
@@ -21,8 +22,10 @@ def Coll_MB():
         player.is_Coll =True
         player.Coll_y = random_b.y
 
-    else:
-        player.is_Coll =False
+
+
+
+        print(player.y)
 
 
 
@@ -62,8 +65,8 @@ def handle_events():
             player.jump_charge = True
             player.jump_on = True
         if event.type == SDL_KEYDOWN and event.key == SDLK_f:
-            print(player.y)
-            print(random_b.y)
+            player.__del__()
+
         if event.type == SDL_KEYUP and event.key == SDLK_c:
             player.jump_charge = False
 
@@ -72,10 +75,10 @@ x = 1
 open_canvas(800,600)
 player = mario()
 stage1_Bk = C_Stage1_Bk()
-random_b=Block('random',500,200)
+random_b=Block('random',200,200)
 Brick_b=Block('brick',300,200)
 platform_list=['random',900,300,'random',1500,300]
-
+block = [Brick_b,random_b];
 
 print(platform_list.count('random'))
 running = True
@@ -93,6 +96,8 @@ while running:
     #update
     player.update()
     Coll_MB()
+
+
     random_b.update(player.scroll_x)
     Brick_b.update(player.scroll_x)
     stage1_Bk.update(player.scroll_x)
