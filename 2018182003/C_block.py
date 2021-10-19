@@ -28,10 +28,12 @@ class Block:
         self.image =load_image("Blocks.png")
 
     def draw(self):
-
         self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x -self.scroll_x,self.y)
         draw_rectangle(*self.get_hitbox())
+
+
     def get_hitbox(self):
+
         return self.x-self.scroll_x - (self.size_x/2),self.y - (self.size_y/2), self.x-self.scroll_x + (self.size_x/2),self.y + (self.size_y/2)
 
     def update(self,scroll_x):
