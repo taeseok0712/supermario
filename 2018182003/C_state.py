@@ -11,6 +11,7 @@ class state(Enum):
 
 class state_block(Enum):
     S_Idle = 0
-    S_Hited =1
+    S_Hiting =1
     S_Brocking = 2
     S_Broken = 3
+    S_Hited = 4
