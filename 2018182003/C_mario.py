@@ -33,6 +33,8 @@ class mario():
 
     def get_hitbox(self):
         return self.x - (self.size_x/2),self.y - (self.size_y/2), self.x + (self.size_x/2),self.y + (self.size_y/2)
+
+
     def draw(self):
 
         self.image.clip_draw(32*self.frame, 192-(32* self.dirction), self.size_x, self.size_y, self.x, self.y)
@@ -44,7 +46,7 @@ class mario():
         self.update_state()
         self.move()
         self.jump()
-        print(self.is_Coll)
+
 
     def move(self):
 
@@ -61,43 +63,40 @@ class mario():
 
 
     def update_state(self):
-        if (self.is_move == True and self.jump_on == False):
+        if self.is_move and self.jump_on == False:
             self.state = state.S_move
-        if (self.is_move == True and self.jump_on == True):
+        if self.is_move and self.jump_on == True:
             self.state = state.S_jump
-        if (self.state == state.S_move):
+        if self.state == state.S_move:
             self.frame = 1 + (self.frame + 1) % 3
 
-        if (self.state == state.S_idle):
+        if self.state == state.S_idle:
             self.frame = 0
             self.accel = 0
-        if (self.state == state.S_landing):
+        if self.state == state.S_landing:
             self.frame = 0
-        if (self.state == state.S_jump):
+        if self.state == state.S_jump:
             self.frame = 4
     def jump(self):
 
-        if (self.jump_on):
-            vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
+        if self.jump_on:
+
             self.jump_accel += 0.2
-            if (self.jump_charge == True):
+            vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
+
+            if self.jump_charge:
                 self.jump_power += 0.6
+            if (vel < 0): self.Drop = True
+            if(self.Drop == False):
+                self.y+=vel
 
-            if self.jump_power * self.jump_accel >= self.gravity * (self.jump_accel ** 2) * 0.5 and self.Drop == False:
+
+
+            if(self.Drop):
                 self.y += vel
-                if(self.First_frame):
-                    self.First_frame = False
-                elif(self.is_Coll): self.Drop = True
-            if self.jump_power * self.jump_accel < self.gravity * (self.jump_accel ** 2) * 0.5 or self.Drop == True:
-                self.y += vel
-
-              
-                if(self.is_Coll==True):
-
-                    self.Drop= False
 
 
-            if(self.is_Coll and self.Drop == True):
+            if(self.is_Coll and self.Drop):
                 self.jump_on = False
                 self.Drop = False
                 self.y = self.Coll_y + self.size_y/2

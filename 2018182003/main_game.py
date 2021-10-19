@@ -20,6 +20,7 @@ def collide(a,b):
     return True
 
 def collide_T_to_B(a,b):
+    # a player # b box
     left_a, bottom_a, right_a, top_a = a.get_hitbox()
     left_b, bottom_b, right_b, top_b = b.get_hitbox()
     if bottom_a < top_b : return True
@@ -30,22 +31,26 @@ def handle_events():
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
+
+        if event.type == SDL_KEYUP and event.key == SDLK_RIGHT:
+            if (player.move_dir == 1):
+                player.is_move = False
+                player.state = state.S_idle
+        if event.type == SDL_KEYUP and event.key == SDLK_LEFT:
+            if(player.move_dir == -1):
+                player.is_move = False
+                player.state = state.S_idle
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
-            player.state= state.S_move
+            player.state = state.S_move
+
             player.is_move = True
             player.dirction = 1
             player.move_dir = 1
         if event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
-            player.state= state.S_move
+            player.state = state.S_move
             player.is_move = True
             player.dirction = 2
             player.move_dir = -1
-        if event.type == SDL_KEYUP and event.key == SDLK_RIGHT:
-            player.state = state.S_idle
-            player.is_move = False
-        if event.type == SDL_KEYUP and event.key == SDLK_LEFT:
-            player.is_move = False
-            player.state = state.S_idle
         if event.type == SDL_KEYDOWN and event.key == SDLK_c:
             player.state = state.S_jump
             player.jump_charge = True
