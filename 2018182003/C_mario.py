@@ -1,6 +1,6 @@
 from pico2d import *
 from C_state import state
-
+from C_state import Mario_state
 class mario():
     def __init__(self):
 
@@ -28,6 +28,7 @@ class mario():
         self.size_x = 32
         self.size_y = 32
         self.First_frame = True
+        self.M_state =Mario_state.mario
         self.Drop = False
 
 

@@ -1,6 +1,7 @@
 import pico2d
 from pico2d import *
 from C_state import state_block
+from C_state import Mario_state
 import time
 class Block:
 
@@ -8,6 +9,7 @@ class Block:
         pass
     def __init__(self,type,x,y):
         self.type = type
+        self.M_state =Mario_state.mario
         self.x = x
         self.y = y
         self.size_x = 32
@@ -50,16 +52,26 @@ class Block:
             self.state = state_block.S_Hiting
             self.move_on = True
 
+        if (self.type_a == 0 and self.is_hit == True and self.state == state_block.S_Idle):
+            self.state = state_block.S_Hiting
+            self.Flame_Change_Start = time.time();
+            self.move_on = True
+
+
 
 
 
     def move(self):
         if (self.move_on == True and self.state == state_block.S_Hiting):
-            self.y += 8
+            self.y += 5
+            print('hit')
             self.move_on = False
         if self.Flame_Change_End - self.Flame_Change_Start > 0.28 and self.move_on == False and self.state == state_block.S_Hiting:
-            self.y -= 8
+            self.y -= 5
             self.state = state_block.S_Hited
+            if (self.M_state == Mario_state.mario and self.type_a == 0):
+                self.state = state_block.S_Idle
+                self.is_hit =False
 
 
 

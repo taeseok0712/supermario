@@ -5,11 +5,11 @@ class C_Stage1_Bk:
         self.image =load_image('World 1-1_1.png')
         self.scroll_x =0
 
-        self.UI_image = load_image(('UI.png'))
+
     def draw(self):
      #   self.image.clip_draw( 0,0,800,600,400-self.scroll_x,300)
         self.image.clip_draw(0, 0, 3376 * 2 , 600, 3376 - self.scroll_x, 300)
-        self.UI_image.draw(400,300,800,600)
+
 
 
         #draw_rectangle(0,0,800 -self.scroll_x,80)

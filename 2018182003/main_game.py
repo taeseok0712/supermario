@@ -6,6 +6,7 @@ from C_block import Block
 from C_Stage1_Back_Ground import C_Stage1_Bk
 import game_framework
 import title_state
+from C_UI import C_UI_
 from C_Ground import Ground
 name = "MainState"
 
@@ -67,7 +68,7 @@ def handle_events():
 def enter():
 
     global player
-
+    global Ui
     global stage1_Bk
     global Platform
     global block
@@ -75,7 +76,7 @@ def enter():
     global Grounds
     player = mario()
     stage1_Bk = C_Stage1_Bk()
-
+    Ui =C_UI_()
     platform_list=['random',900,300,'random',1500,300]
 
     Platform =[Block('random',200,200),Block('brick',500,200)]
@@ -112,12 +113,8 @@ def update():
                 player.jump_on = False
                 player.jump_accel = 0
 
-
         else:
             player.is_Coll = False
-
-
-
 
 
     for ground in Grounds:
@@ -126,7 +123,7 @@ def update():
             player.Coll_y = 80
 
 
-
+    Ui.update(0,0,0)
 
 
 def draw():
@@ -137,7 +134,7 @@ def draw():
         block.draw()
     for ground in Grounds:
         ground.draw()
-
+    Ui.draw()
     update_canvas()
     delay(0.03)
 

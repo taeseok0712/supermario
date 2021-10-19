@@ -15,3 +15,8 @@ class state_block(Enum):
     S_Brocking = 2
     S_Broken = 3
     S_Hited = 4
+
+class Mario_state(Enum):
+    mario =0
+    Super_mario =1
+    Fire_mario = 2
