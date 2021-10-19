@@ -86,20 +86,29 @@ class mario():
 
             if self.jump_charge:
                 self.jump_power += 0.6
-            if (vel < 0): self.Drop = True
+            if (vel < 0):self.Drop = True;self.jump_accel = 0
             if(self.Drop == False):
                 self.y+=vel
 
-
-
             if(self.Drop):
-                self.y += vel
+                self.y -= vel
 
 
             if(self.is_Coll and self.Drop):
                 self.jump_on = False
                 self.Drop = False
                 self.y = self.Coll_y + self.size_y/2
+                self.jump_accel = 0
+                self.jump_power = 10
+                self.state = state.S_idle
+        if self.jump_on == False and self.Drop:
+            pass
+
+
+            if (self.is_Coll):
+                self.jump_on = False
+                self.Drop = False
+                self.y = self.Coll_y + self.size_y / 2
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle

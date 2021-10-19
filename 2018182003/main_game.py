@@ -103,15 +103,20 @@ def update():
 
     if collide(player,random_b):
         player.is_Coll = True
-        print(player.Coll_y)
-        player.Coll_y = random_b.y + random_b.size_y/2
+
+
         if (collide_T_to_B(player, random_b)):
             random_b.is_hit = True
             random_b.is_coll = True
             player.Drop = True
 
+            player.jump_on = False
+            player.jump_accel = 0
+
+
     else:
-        player.Drop = False
+        player.is_Coll = False
+
 
 
 
@@ -119,8 +124,7 @@ def update():
         if collide(player, ground):
             player.is_Coll = True
             player.Coll_y = 80
-        else:
-            player.is_Coll = False
+
 
 
 
