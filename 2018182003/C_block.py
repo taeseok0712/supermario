@@ -63,11 +63,11 @@ class Block:
 
     def move(self):
         if (self.move_on == True and self.state == state_block.S_Hiting):
-            self.y += 5
+            self.y += 16
             print('hit')
             self.move_on = False
-        if self.Flame_Change_End - self.Flame_Change_Start > 0.28 and self.move_on == False and self.state == state_block.S_Hiting:
-            self.y -= 5
+        if self.Flame_Change_End - self.Flame_Change_Start > 0.2 and self.move_on == False and self.state == state_block.S_Hiting:
+            self.y -= 16
             self.state = state_block.S_Hited
             if (self.M_state == Mario_state.mario and self.type_a == 0):
                 self.state = state_block.S_Idle
