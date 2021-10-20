@@ -31,6 +31,7 @@ class mario():
         self.Coll_y = 0
         self.size_x = 32
         self.size_y = 32
+        self.is_land = True
         self.First_frame = True
         self.M_state =Mario_state.mario
         self.Drop = False
@@ -102,7 +103,7 @@ class mario():
 
     def jump(self):
         if(self.is_Coll==False): self.drop=True
-        print(self.jump_on)
+
         if self.jump_on:
 
             self.jump_accel += 0.2
@@ -115,9 +116,11 @@ class mario():
             self.y+=vel
 
             if(self.is_Coll and self.Drop):
+                self.y = self.Coll_y + self.size_y/2
                 self.jump_on = False
                 self.Drop = False
-                self.y = self.Coll_y + self.size_y/2
+
+                print(self.size_y)
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle
@@ -126,9 +129,10 @@ class mario():
             self.jump_accel +=0.2
             self.y -= 5 * self.gravity * self.jump_accel *0.5
             if (self.y - 5 * self.gravity * self.jump_accel *0.5 <= self.Coll_y):
+                self.y = self.Coll_y + self.size_y / 2
                 self.jump_on = False
                 self.Drop = False
-                self.y = self.Coll_y + self.size_y /2
+
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle

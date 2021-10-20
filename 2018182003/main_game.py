@@ -103,15 +103,14 @@ def exit():
 def update():
 
     for block in Platform:
+        print(collide(player, block))
         if collide(player, block):
             block.is_coll = True
-            if is_Top(player,block):
+            if is_Top(player,block) and block.state != state_block.S_Hiting:
                 player.jump_on = False
-                player.Coll_y = block.y + block.size_y
+                player.Coll_y = block.y +block.size_y/2
 
-            if (player.Drop == False):
-
-
+            if (is_Top(player,block)!=True):
                 block.is_hit = True
                 player.Drop = True
                 player.is_Coll = True
