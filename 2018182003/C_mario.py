@@ -1,9 +1,10 @@
 from pico2d import *
 from C_state import state
 from C_state import Mario_state
+import time
 class mario():
     def __init__(self):
-
+        self.M_State = Mario_state.mario
         self.x =200
         self.y= 96
         self.scroll_x = 0
@@ -19,9 +20,12 @@ class mario():
         self.move_dir = 1 #1이면 오른쪽 -1ㅇ면 왼쪽
         self.jump_power = 10
         self.jump_on =False
-
+        self.Flame_Change_Start = time.time();
+        self.Flame_Change_End = time.time();
         self.jump_charge = False
         self.image = load_image('player_Mario.png')
+        self.image_G = load_image('Mario_grow.png')
+        self.image_S = load_image('Super_mario.png')
         self.jump_height = 0
         self.is_Coll = False
         self.Coll_y = 0
@@ -30,6 +34,7 @@ class mario():
         self.First_frame = True
         self.M_state =Mario_state.mario
         self.Drop = False
+        self.time_cnt = 0
 
 
     def get_hitbox(self):
@@ -38,8 +43,14 @@ class mario():
 
     def draw(self):
 
-        self.image.clip_draw(32*self.frame, 192-(32* self.dirction), self.size_x, self.size_y, self.x, self.y)
-
+        if(self.M_state == Mario_state.mario):
+            self.image.clip_draw(32*self.frame, 64-(32* self.dirction), self.size_x, self.size_y, self.x, self.y)
+        if (self.M_state == Mario_state.Growing):
+            self.image_G.clip_draw(32 * self.frame, 128 - (64 *self.dirction), self.size_x, self.size_y, self.x, self.y)
+        if (self.M_state == Mario_state.mario):
+            self.image.clip_draw(32 * self.frame, 64 - (32 * self.dirction), self.size_x, self.size_y, self.x, self.y)
+        if (self.M_state == Mario_state.Super_mario):
+            self.image_S.clip_draw(32 * self.frame, 128 - (64 * self.dirction), self.size_x, self.size_y, self.x,self.y)
         draw_rectangle(*self.get_hitbox())
 
 
@@ -64,20 +75,31 @@ class mario():
 
 
     def update_state(self):
+        self.Flame_Change_End =time.time()
         if self.is_move and self.jump_on == False:
             self.state = state.S_move
         if self.is_move and self.jump_on == True:
             self.state = state.S_jump
-        if self.state == state.S_move:
-            self.frame = 1 + (self.frame + 1) % 3
+        if(self.M_state != Mario_state.Growing):
+            if self.state == state.S_move:
+                self.frame = 1 + (self.frame + 1) % 3
+            if self.state == state.S_idle:
+                self.frame = 0
+                self.accel = 0
+            if self.state == state.S_landing:
+                self.frame = 0
+            if self.state == state.S_jump:
+                self.frame = 4
+        if(self.M_state == Mario_state.Growing):
+            if self.Flame_Change_End - self.Flame_Change_Start > 0.1:
+                self.frame = (self.frame + 1) % 4
+                self.time_cnt +=1
 
-        if self.state == state.S_idle:
-            self.frame = 0
-            self.accel = 0
-        if self.state == state.S_landing:
-            self.frame = 0
-        if self.state == state.S_jump:
-            self.frame = 4
+                self.Flame_Change_Start = time.time();
+            if self.time_cnt == 8:
+                self.M_state =Mario_state.Super_mario
+                self.time_cnt = 0
+
     def jump(self):
 
         if self.jump_on:
@@ -102,7 +124,7 @@ class mario():
                 self.jump_power = 10
                 self.state = state.S_idle
         if self.Drop and self.jump_on==False:
-            print('dd')
+
             self.jump_accel +=0.2
             self.y -= 5 * self.gravity * self.jump_accel *0.5
             if (self.is_Coll and self.Drop and self.jump_accel > 0.2):

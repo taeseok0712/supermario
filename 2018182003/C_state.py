@@ -20,3 +20,4 @@ class Mario_state(Enum):
     mario =0
     Super_mario =1
     Fire_mario = 2
+    Growing = 4

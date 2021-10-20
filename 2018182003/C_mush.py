@@ -1,0 +1,38 @@
+import pico2d
+from pico2d import *
+
+
+class cMushRoom:
+
+
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.size_x = 32
+        self.size_y = 32
+        self.is_coll = False
+        self.frame = 0
+        self.scroll_x = 0;
+        self.move_on = False
+        self.is_exist = False
+        self.image =load_image("mushroom.png")
+
+
+    def draw(self):
+            self.image.clip_draw(0, 0, 16, 16, self.x - self.scroll_x, self.y, 32, 32)
+
+            draw_rectangle(*self.get_hitbox())
+
+    def get_hitbox(self):
+            return self.x-self.scroll_x - (self.size_x/2),self.y - (self.size_y/2), self.x-self.scroll_x + (self.size_x/2),self.y + (self.size_y/2)
+
+    def update(self,scroll_x):
+        self.scroll_x = scroll_x
+
+
+
+
+
+
+
+

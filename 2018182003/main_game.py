@@ -2,7 +2,10 @@ from pico2d import *
 import random
 from C_mario import mario
 from C_state import state
+from C_state import Mario_state
+from C_state import state_block
 from C_block import Block
+from C_mush import cMushRoom
 from C_Stage1_Back_Ground import C_Stage1_Bk
 import game_framework
 import title_state
@@ -27,7 +30,7 @@ def collide_T_to_B(a,b):
     if bottom_a < top_b : return True
 
 def handle_events():
-    global running
+
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -57,6 +60,7 @@ def handle_events():
             player.jump_charge = True
             player.jump_on = True
 
+
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
 
@@ -74,22 +78,27 @@ def enter():
     global block
     global blocks
     global Grounds
+    global Mush
+    global Mushrooms
     player = mario()
     stage1_Bk = C_Stage1_Bk()
+
+    Mushrooms = []
     Ui =C_UI_()
     platform_list=['random',900,300,'random',1500,300]
 
-    Platform =[Block('random',200,200),Block('brick',500,200)]
+    Platform =[Block('random',200,200),Block('brick',500,200),Block('brick',700,200)]
     Grounds =[Ground(1104)]
 
 
 
 def exit():
-    global player , random_b ,stage1_Bk,Grounds,Platform
+    global player , random_b ,stage1_Bk,Grounds,Platform,Mush
     del (player)
     del (Platform)
     del (Grounds)
     del (stage1_Bk)
+    del (Mush)
 def update():
 
     for block in Platform:
@@ -97,7 +106,8 @@ def update():
     for ground in Grounds:
         ground.update(player.scroll_x)
     player.update()
-
+    for Mush in Mushrooms:
+        Mush.update(player.scroll_x)
     stage1_Bk.update(player.scroll_x)
 
 
@@ -106,15 +116,33 @@ def update():
         if collide(player, block):
 
             if (collide_T_to_B(player, block)):
+
+                print(block.type)
                 block.is_hit = True
                 block.is_coll = True
                 player.Drop = True
                 player.is_Coll = True
                 player.jump_on = False
                 player.jump_accel = 0
+                if (block.type == 'brick' and player.M_state == Mario_state.Super_mario):
+
+                    Platform.remove(block)
+                if(block.type == 'random' and block.state == state_block.S_Idle):
+                    Mushrooms.append(cMushRoom(block.x ,block.y+block.size_y))
+
+
+
 
         else:
             player.is_Coll = False
+
+    for Mush in Mushrooms:
+        if collide(player, Mush):
+            Mushrooms.remove(Mush)
+            if player.M_state ==Mario_state.mario:
+                player.M_state = Mario_state.Growing
+                player.size_y = 64
+                player.y += 16
 
 
     for ground in Grounds:
@@ -123,7 +151,7 @@ def update():
             player.Coll_y = 80
 
 
-    Ui.update(0,0,0)
+    Ui.update()
 
 
 def draw():
@@ -135,6 +163,8 @@ def draw():
     for ground in Grounds:
         ground.draw()
     Ui.draw()
+    for Mush in Mushrooms:
+        Mush.draw()
     update_canvas()
     delay(0.03)
 
