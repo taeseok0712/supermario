@@ -101,7 +101,8 @@ class mario():
                 self.time_cnt = 0
 
     def jump(self):
-
+        if(self.is_Coll==False): self.drop=True
+        print(self.jump_on)
         if self.jump_on:
 
             self.jump_accel += 0.2
@@ -112,9 +113,6 @@ class mario():
             if (vel < 0):self.Drop = True;
 
             self.y+=vel
-
-
-
 
             if(self.is_Coll and self.Drop):
                 self.jump_on = False
@@ -127,10 +125,10 @@ class mario():
 
             self.jump_accel +=0.2
             self.y -= 5 * self.gravity * self.jump_accel *0.5
-            if (self.is_Coll and self.Drop and self.jump_accel > 0.2):
+            if (self.y - 5 * self.gravity * self.jump_accel *0.5 <= self.Coll_y):
                 self.jump_on = False
                 self.Drop = False
-                self.y = self.Coll_y + self.size_y / 2
+                self.y = self.Coll_y + self.size_y /2
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle

@@ -23,11 +23,12 @@ def collide(a,b):
     if bottom_a > top_b: return False
     return True
 
-def collide_T_to_B(a,b):
+def is_Top(a,b):
     # a player # b box
     left_a, bottom_a, right_a, top_a = a.get_hitbox()
     left_b, bottom_b, right_b, top_b = b.get_hitbox()
-    if bottom_a < top_b : return True
+    if top_a > top_b : return True
+
 
 def handle_events():
 
@@ -78,7 +79,7 @@ def enter():
     global block
     global blocks
     global Grounds
-    global Mush
+
     global Mushrooms
     player = mario()
     stage1_Bk = C_Stage1_Bk()
@@ -93,45 +94,33 @@ def enter():
 
 
 def exit():
-    global player , random_b ,stage1_Bk,Grounds,Platform,Mush
+    global player , random_b ,stage1_Bk,Grounds,Platform,Mushrooms
     del (player)
     del (Platform)
     del (Grounds)
     del (stage1_Bk)
-    del (Mush)
+    global Mushrooms
 def update():
 
     for block in Platform:
-        block.update(player.scroll_x)
-    for ground in Grounds:
-        ground.update(player.scroll_x)
-    player.update()
-    for Mush in Mushrooms:
-        Mush.update(player.scroll_x)
-    stage1_Bk.update(player.scroll_x)
-
-
-
-    for block in Platform:
         if collide(player, block):
+            block.is_coll = True
+            if is_Top(player,block):
+                player.jump_on = False
+                player.Coll_y = block.y + block.size_y
 
-            if (collide_T_to_B(player, block)):
+            if (player.Drop == False):
 
-                print(block.type)
+
                 block.is_hit = True
-                block.is_coll = True
                 player.Drop = True
                 player.is_Coll = True
                 player.jump_on = False
                 player.jump_accel = 0
                 if (block.type == 'brick' and player.M_state == Mario_state.Super_mario):
-
                     Platform.remove(block)
                 if(block.type == 'random' and block.state == state_block.S_Idle):
                     Mushrooms.append(cMushRoom(block.x ,block.y+block.size_y))
-
-
-
 
         else:
             player.is_Coll = False
@@ -150,7 +139,14 @@ def update():
             player.is_Coll = True
             player.Coll_y = 80
 
-
+    for block in Platform:
+        block.update(player.scroll_x)
+    for ground in Grounds:
+        ground.update(player.scroll_x)
+    player.update()
+    for Mush in Mushrooms:
+        Mush.update(player.scroll_x)
+    stage1_Bk.update(player.scroll_x)
     Ui.update()
 
 
