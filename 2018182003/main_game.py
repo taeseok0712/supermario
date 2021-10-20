@@ -6,6 +6,7 @@ from C_state import Mario_state
 from C_state import state_block
 from C_block import Block
 from C_mush import cMushRoom
+from C_gumba import cGumba
 from C_Stage1_Back_Ground import C_Stage1_Bk
 import game_framework
 import title_state
@@ -61,7 +62,12 @@ def handle_events():
             player.jump_charge = True
             player.jump_on = True
 
-
+        if event.type == SDL_KEYDOWN and event.key == SDLK_f:
+            '''
+            if(player.M_state ==Mario_state.Super_mario):
+                 player.M_state = Mario_state.Size_Dowm
+            '''
+            Monsters.append(cGumba())
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
 
@@ -79,7 +85,7 @@ def enter():
     global block
     global blocks
     global Grounds
-
+    global Monsters
     global Mushrooms
     player = mario()
     stage1_Bk = C_Stage1_Bk()
@@ -87,7 +93,7 @@ def enter():
     Mushrooms = []
     Ui =C_UI_()
     platform_list=['random',900,300,'random',1500,300]
-
+    Monsters = []
     Platform =[Block('random',200,200),Block('brick',500,200),Block('brick',700,200)]
     Grounds =[Ground(1104)]
 
@@ -103,11 +109,11 @@ def exit():
 def update():
 
     for block in Platform:
-        print(collide(player, block))
         if collide(player, block):
             block.is_coll = True
             if is_Top(player,block) and block.state != state_block.S_Hiting:
-                player.jump_on = False
+                if(player.state != state.S_landing):
+                    player.state = state.S_landing
                 player.Coll_y = block.y +block.size_y/2
 
             if (is_Top(player,block)!=True):
@@ -129,8 +135,17 @@ def update():
             Mushrooms.remove(Mush)
             if player.M_state ==Mario_state.mario:
                 player.M_state = Mario_state.Growing
-                player.size_y = 64
                 player.y += 16
+
+    for monster in Monsters:
+        if collide(player, monster):
+            if (player.M_state == Mario_state.Super_mario):
+                player.M_state = Mario_state.Size_Dowm
+
+
+
+
+
 
 
     for ground in Grounds:
@@ -140,26 +155,37 @@ def update():
 
     for block in Platform:
         block.update(player.scroll_x)
+
     for ground in Grounds:
         ground.update(player.scroll_x)
     player.update()
     for Mush in Mushrooms:
         Mush.update(player.scroll_x)
     stage1_Bk.update(player.scroll_x)
+    for monster in Monsters:
+        monster.update(player.scroll_x)
+        if monster.get_dead():
+            Monsters.remove(monster)
+
+
     Ui.update()
 
 
 def draw():
     clear_canvas()
     stage1_Bk.draw()
+    for monster in Monsters:
+        monster.draw()
     player.draw()
+    for Mush in Mushrooms:
+        Mush.draw()
     for block in Platform:
         block.draw()
     for ground in Grounds:
         ground.draw()
+
     Ui.draw()
-    for Mush in Mushrooms:
-        Mush.draw()
+
     update_canvas()
     delay(0.03)
 

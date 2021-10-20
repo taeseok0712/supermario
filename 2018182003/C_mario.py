@@ -46,7 +46,7 @@ class mario():
 
         if(self.M_state == Mario_state.mario):
             self.image.clip_draw(32*self.frame, 64-(32* self.dirction), self.size_x, self.size_y, self.x, self.y)
-        if (self.M_state == Mario_state.Growing):
+        if (self.M_state == Mario_state.Growing or self.M_state == Mario_state.Size_Dowm ):
             self.image_G.clip_draw(32 * self.frame, 128 - (64 *self.dirction), self.size_x, self.size_y, self.x, self.y)
         if (self.M_state == Mario_state.mario):
             self.image.clip_draw(32 * self.frame, 64 - (32 * self.dirction), self.size_x, self.size_y, self.x, self.y)
@@ -56,9 +56,13 @@ class mario():
 
 
     def update(self):
+
         self.update_state()
         self.move()
         self.jump()
+        if(self.M_state ==Mario_state.mario):
+            self.size_y =32
+        else:self.size_y = 64
 
 
     def move(self):
@@ -101,8 +105,20 @@ class mario():
                 self.M_state =Mario_state.Super_mario
                 self.time_cnt = 0
 
+
+        if (self.M_state == Mario_state.Size_Dowm):
+            if self.Flame_Change_End - self.Flame_Change_Start > 0.1:
+                self.frame = (self.frame + 1) % 4
+                self.time_cnt += 1
+
+                self.Flame_Change_Start = time.time();
+            if self.time_cnt == 8:
+                self.M_state = Mario_state.mario
+                self.time_cnt = 0
+                self.y -= 16
+
+
     def jump(self):
-        if(self.is_Coll==False): self.drop=True
 
         if self.jump_on:
 
@@ -111,24 +127,24 @@ class mario():
 
             if self.jump_charge:
                 self.jump_power += 0.6
-            if (vel < 0):self.Drop = True;
+            if (vel < 0): self.Drop = True;
 
-            self.y+=vel
+            self.y += vel
 
-            if(self.is_Coll and self.Drop):
-                self.y = self.Coll_y + self.size_y/2
+            if (self.is_Coll and self.Drop):
+                self.y = self.Coll_y + self.size_y / 2
                 self.jump_on = False
                 self.Drop = False
 
-                print(self.size_y)
+
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle
-        if self.Drop and self.jump_on==False:
+        if self.Drop and self.jump_on == False:
 
-            self.jump_accel +=0.2
-            self.y -= 5 * self.gravity * self.jump_accel *0.5
-            if (self.y - 5 * self.gravity * self.jump_accel *0.5 <= self.Coll_y):
+            self.jump_accel += 0.05
+
+            if (self.y - 5 * self.gravity * self.jump_accel * 0.5 < self.Coll_y):
                 self.y = self.Coll_y + self.size_y / 2
                 self.jump_on = False
                 self.Drop = False
@@ -136,6 +152,8 @@ class mario():
                 self.jump_accel = 0
                 self.jump_power = 10
                 self.state = state.S_idle
+            self.y -= 5 * self.gravity * self.jump_accel * 0.5
+
 
 
 
