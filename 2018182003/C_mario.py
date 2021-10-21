@@ -1,16 +1,15 @@
 from pico2d import *
-from C_state import state
-from C_state import Mario_state
+from C_state import *
 import time
 class mario():
     def __init__(self):
         self.M_State = Mario_state.mario
+
         self.x =200
         self.y= 96
         self.scroll_x = 0
         self.state = state.S_idle
         self.frame = 0
-        self.platform=[]
         self.gravity = 9.8
         self.priv_height =self.y
         self.accel =0
@@ -31,6 +30,8 @@ class mario():
         self.Coll_y = 0
         self.size_x = 32
         self.size_y = 32
+        self.move_R = 0
+        self.move_L = 0
         self.is_land = True
         self.First_frame = True
         self.M_state =Mario_state.mario
@@ -56,7 +57,7 @@ class mario():
 
 
     def update(self):
-
+        self.move_dir = self.move_R +self.move_L
         self.update_state()
         self.move()
         self.jump()
@@ -66,6 +67,18 @@ class mario():
 
 
     def move(self):
+
+            if(self.move_dir == -1):
+                self.dirction =2
+            if(self.move_dir ==1):
+                self.dirction =1
+
+            if(self.move_dir == 0):
+                self.is_move =False
+                if(self.state != state.S_jump):
+                    self.state = state.S_idle
+            else:
+                self.is_move =True
 
             if (self.is_move):
                 if self.x < 650 - self.move_dir * self.accel and self.x >= 50 - self.move_dir * self.accel:
@@ -124,7 +137,7 @@ class mario():
 
             self.jump_accel += 0.2
             vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
-
+            print(vel)
             if self.jump_charge:
                 self.jump_power += 0.6
             if (vel < 0): self.Drop = True;

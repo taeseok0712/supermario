@@ -39,24 +39,24 @@ def handle_events():
             game_framework.quit()
 
         if event.type == SDL_KEYUP and event.key == SDLK_RIGHT:
-            if (player.move_dir == 1):
-                player.is_move = False
+
+                player.move_R = 0
                 player.state = state.S_idle
         if event.type == SDL_KEYUP and event.key == SDLK_LEFT:
-            if(player.move_dir == -1):
-                player.is_move = False
+
+                player.move_L =0
                 player.state = state.S_idle
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
             player.state = state.S_move
 
             player.is_move = True
-            player.dirction = 1
-            player.move_dir = 1
+
+            player.move_R = 1
         if event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
             player.state = state.S_move
             player.is_move = True
-            player.dirction = 2
-            player.move_dir = -1
+
+            player.move_L = -1
         if event.type == SDL_KEYDOWN and event.key == SDLK_c:
             player.state = state.S_jump
             player.jump_charge = True
@@ -138,9 +138,16 @@ def update():
                 player.y += 16
 
     for monster in Monsters:
-        if collide(player, monster):
-            if (player.M_state == Mario_state.Super_mario):
-                player.M_state = Mario_state.Size_Dowm
+        if (player.state == state.S_jump):
+            if collide(player, monster):
+                print('d')
+                monster.set_hitted()
+        if (player.state !=state.S_jump):
+            print(monster.get_hitted())
+            if collide(player, monster)and monster.get_hitted()==False:
+                if (player.M_state == Mario_state.Super_mario):
+                    player.M_state = Mario_state.Size_Dowm
+
 
 
 

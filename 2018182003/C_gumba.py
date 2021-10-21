@@ -21,7 +21,7 @@ class cGumba:
         self.y = 96
         self.size_x = 32
         self.size_y = 32
-        self.speed = 5
+
         self.frame = 0
         self.scroll_x = 0;
         self.ishitted = False
@@ -39,15 +39,16 @@ class cGumba:
             return self.x-self.scroll_x - (self.size_x/2),self.y - (self.size_y/2), self.x-self.scroll_x + (self.size_x/2),self.y + (self.size_y/2)
 
     def update(self,scroll_x):
+        speed = 5
         self.Flame_Change_End = time.time()
 
         if self.ishitted== False:
             if self.Flame_Change_End - self.Flame_Change_Start > 0.1:
                 self.frame = (self.frame + 1) % 2
                 self.Flame_Change_Start = time.time();
-                self.x -=self.speed
+                self.x -=5
         if self.ishitted:
-            print(self.frame)
+
             self.frame = 2
             self.speed = 0
             if self.Flame_Change_End - self.Flame_Change_Start > 0.2:
@@ -63,6 +64,9 @@ class cGumba:
 
     def set_hitted(self):
         self.ishitted = True
+
+    def get_hitted(self):
+        return self.ishitted
 
 
 
