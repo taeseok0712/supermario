@@ -107,24 +107,26 @@ def enter():
     Ui =C_UI_()
     platform_list=['random',900,300,'random',1500,300]
     Monsters = []
-    Platform =[Block('random',200,200)]
-
+    Platform =[Block('random',200,200),Block('brick',400,200)]
+    Platform.append(Block('random',-50,0))
     Grounds =[Ground(1104)]
 
 
 def lateupdate():
     x= 0
-    for block in Platform:
-        if collide(player , block):
+
+    for ground in Grounds:
+        if collide(player, ground):
             player.is_Coll = True
-            player.Drop = True
-
-            print(player.Drop,player.is_Coll)
-        if not collide(player , block):
-            player.is_Coll = False
+            player.Coll_y = 80
+        else:
+            player.is_Coll == False
 
 
 
+
+
+'''
     for Mush in Mushrooms:
         if collide(player, Mush):
             Mushrooms.remove(Mush)
@@ -142,12 +144,13 @@ def lateupdate():
             if collide(player, monster)and monster.get_hitted()==False:
                 if (player.M_state == Mario_state.Super_mario):
                     player.M_state = Mario_state.Size_Dowm
+'''
 
 
-    for ground in Grounds:
-        if collide(player, ground):
-            player.is_Coll = True
-            player.Coll_y = 80
+
+
+
+
 
 
 def exit():
@@ -159,7 +162,7 @@ def exit():
     del (Mushrooms)
 def update():
 
-
+    player.get_plat(Platform)
     for block in Platform:
         block.update(player.scroll_x)
     for ground in Grounds:

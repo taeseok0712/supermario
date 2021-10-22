@@ -38,7 +38,8 @@ class mario():
         self.M_state =Mario_state.mario
         self.Drop = False
         self.time_cnt = 0
-
+        self.vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
+        self.Platform =[]
 
     def get_hitbox(self):
         return self.x - (self.size_x/2),self.y - (self.size_y/2), self.x + (self.size_x/2),self.y + (self.size_y/2)
@@ -58,6 +59,7 @@ class mario():
 
 
     def update(self):
+        self.vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
         self.jump()
         self.move_dir = self.move_R +self.move_L
         self.update_state()
@@ -66,7 +68,7 @@ class mario():
         if(self.M_state ==Mario_state.mario):
             self.size_y =32
         else:self.size_y = 64
-
+        self.Late_update()
 
     def move(self):
             if(self.move_dir == -1):
@@ -133,33 +135,71 @@ class mario():
 
 
     def jump(self):
-        vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
+
 
         if self.jump_on:
+
             self.jump_accel += 0.2
             if self.jump_charge:
                 self.jump_power += 0.6
-            if (vel>= 0 and not self.Drop):
+            if (self.vel>= 0 and not self.Drop and self.jump_accel!=0):
 
-                self.y += vel #올라가는중
+                self.y += self.vel #올라가는중
+            if (self.vel < 0):
+                self.Drop = True
+            if (self.vel > 0):
+                pass
 
-            if(self.Drop and self.is_Coll) or vel<=0:
-                print("d")
-                self.y += vel
+            if((self.Drop and self.is_Coll) or self.vel<=0):
+
+                self.Drop =False
+                self.y += self.vel
                 if(self.is_Coll):
 
                     self.y = self.Coll_y + self.size_y/2
-                    self.Drop =False
+
                     self.jump_on =False
-                    self.jump_accel = 0.2
+                    if(self.jump_accel!=0):
+                        print("d")
+                        self.jump_accel = 0
                     self.jump_power = 10
                     self.state = state.S_idle
+                    self.is_land = True
+        else:
+            pass
 
 
+    def collide(a, b):
+        left_a, bottom_a, right_a, top_a = a.get_hitbox()
+        left_b, bottom_b, right_b, top_b = b.get_hitbox()
+
+        if left_a > right_b: return False
+        if right_a < left_b: return False
+        if top_a < bottom_b: return False
+        if bottom_a > top_b: return False
+        return True
+
+    def get_plat(self,plat):
+        self.Platform= plat
 
 
+    def Late_update(self):
 
+        for block in self.Platform:
+            if self.collide(block) and self.vel > 0 and not self.Drop:
 
+                self.is_Coll = True
+                self.Drop = True
+                print(self.Drop)
+            else:
+                self.is_Coll=False
+                #print(self.Coll_y, self.is_Coll, self.Drop, self.jump_on)
+        for block in self.Platform:
+            if self.collide(block) and self.vel < 0 or self.Drop:
+
+                self.Coll_y = block.y + block.size_y/2
+                self.is_Coll = True
+                self.Drop = False
 
 
 
