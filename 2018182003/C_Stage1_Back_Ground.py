@@ -7,7 +7,7 @@ class C_Stage1_Bk:
 
 
     def draw(self):
-     #   self.image.clip_draw( 0,0,800,600,400-self.scroll_x,300)
+     #self.image.clip_draw( 0,0,800,600,400-self.scroll_x,300)
         self.image.clip_draw(0, 0, 3376 * 2 , 600, 3376 - self.scroll_x, 300)
 
 

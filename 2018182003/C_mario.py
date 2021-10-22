@@ -13,7 +13,7 @@ class mario():
         self.gravity = 9.8
         self.priv_height =self.y
         self.accel =0
-        self.jump_accel =0
+        self.jump_accel =0.2
         self.is_move = False
         self.dirction = 1
         self.move_dir = 1 #1이면 오른쪽 -1ㅇ면 왼쪽
@@ -32,6 +32,7 @@ class mario():
         self.size_y = 32
         self.move_R = 0
         self.move_L = 0
+        self.hitover = False
         self.is_land = True
         self.First_frame = True
         self.M_state =Mario_state.mario
@@ -57,19 +58,19 @@ class mario():
 
 
     def update(self):
+        self.jump()
         self.move_dir = self.move_R +self.move_L
         self.update_state()
         self.move()
-        self.jump()
+
         if(self.M_state ==Mario_state.mario):
             self.size_y =32
         else:self.size_y = 64
 
 
     def move(self):
-
             if(self.move_dir == -1):
-                self.dirction =2
+             self.dirction =2
             if(self.move_dir ==1):
                 self.dirction =1
 
@@ -132,40 +133,34 @@ class mario():
 
 
     def jump(self):
+        vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
 
         if self.jump_on:
-
             self.jump_accel += 0.2
-            vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
-            print(vel)
             if self.jump_charge:
                 self.jump_power += 0.6
-            if (vel < 0): self.Drop = True;
+            if (vel>= 0 and not self.Drop):
 
-            self.y += vel
+                self.y += vel #올라가는중
 
-            if (self.is_Coll and self.Drop):
-                self.y = self.Coll_y + self.size_y / 2
-                self.jump_on = False
-                self.Drop = False
+            if(self.Drop and self.is_Coll) or vel<=0:
+                print("d")
+                self.y += vel
+                if(self.is_Coll):
+
+                    self.y = self.Coll_y + self.size_y/2
+                    self.Drop =False
+                    self.jump_on =False
+                    self.jump_accel = 0.2
+                    self.jump_power = 10
+                    self.state = state.S_idle
 
 
-                self.jump_accel = 0
-                self.jump_power = 10
-                self.state = state.S_idle
-        if self.Drop and self.jump_on == False:
 
-            self.jump_accel += 0.05
 
-            if (self.y - 5 * self.gravity * self.jump_accel * 0.5 < self.Coll_y):
-                self.y = self.Coll_y + self.size_y / 2
-                self.jump_on = False
-                self.Drop = False
 
-                self.jump_accel = 0
-                self.jump_power = 10
-                self.state = state.S_idle
-            self.y -= 5 * self.gravity * self.jump_accel * 0.5
+
+
 
 
 

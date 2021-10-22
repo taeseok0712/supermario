@@ -14,6 +14,10 @@ from C_UI import C_UI_
 from C_Ground import Ground
 name = "MainState"
 
+
+FullScreen =False
+
+
 def collide(a,b):
     left_a , bottom_a , right_a , top_a = a.get_hitbox()
     left_b, bottom_b, right_b, top_b = b.get_hitbox()
@@ -28,11 +32,12 @@ def is_Top(a,b):
     # a player # b box
     left_a, bottom_a, right_a, top_a = a.get_hitbox()
     left_b, bottom_b, right_b, top_b = b.get_hitbox()
-    if top_a > top_b : return True
+    if bottom_a >= top_b : return True
+
 
 
 def handle_events():
-
+    global FullScreen
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -68,16 +73,22 @@ def handle_events():
                  player.M_state = Mario_state.Size_Dowm
             '''
             Monsters.append(cGumba())
+        if event.type == SDL_KEYDOWN and event.key == SDLK_k:
+
+
+            resize_canvas(1600,600)
+
+
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
 
         if event.type == SDL_KEYUP and event.key == SDLK_c:
             player.jump_charge = False
 
-# initialization code
 
 def enter():
 
+    global resize_S
     global player
     global Ui
     global stage1_Bk
@@ -87,48 +98,32 @@ def enter():
     global Grounds
     global Monsters
     global Mushrooms
+
     player = mario()
     stage1_Bk = C_Stage1_Bk()
 
+    resize_S = False
     Mushrooms = []
     Ui =C_UI_()
     platform_list=['random',900,300,'random',1500,300]
     Monsters = []
-    Platform =[Block('random',200,200),Block('brick',500,200),Block('brick',700,200)]
+    Platform =[Block('random',200,200)]
+
     Grounds =[Ground(1104)]
 
 
-
-def exit():
-    global player , random_b ,stage1_Bk,Grounds,Platform,Mushrooms
-    del (player)
-    del (Platform)
-    del (Grounds)
-    del (stage1_Bk)
-    global Mushrooms
-def update():
-
+def lateupdate():
+    x= 0
     for block in Platform:
-        if collide(player, block):
-            block.is_coll = True
-            if is_Top(player,block) and block.state != state_block.S_Hiting:
-                if(player.state != state.S_landing):
-                    player.state = state.S_landing
-                player.Coll_y = block.y +block.size_y/2
+        if collide(player , block):
+            player.is_Coll = True
+            player.Drop = True
 
-            if (is_Top(player,block)!=True):
-                block.is_hit = True
-                player.Drop = True
-                player.is_Coll = True
-                player.jump_on = False
-                player.jump_accel = 0
-                if (block.type == 'brick' and player.M_state == Mario_state.Super_mario):
-                    Platform.remove(block)
-                if(block.type == 'random' and block.state == state_block.S_Idle):
-                    Mushrooms.append(cMushRoom(block.x ,block.y+block.size_y))
-
-        else:
+            print(player.Drop,player.is_Coll)
+        if not collide(player , block):
             player.is_Coll = False
+
+
 
     for Mush in Mushrooms:
         if collide(player, Mush):
@@ -140,19 +135,13 @@ def update():
     for monster in Monsters:
         if (player.state == state.S_jump):
             if collide(player, monster):
-                print('d')
+
                 monster.set_hitted()
         if (player.state !=state.S_jump):
-            print(monster.get_hitted())
+
             if collide(player, monster)and monster.get_hitted()==False:
                 if (player.M_state == Mario_state.Super_mario):
                     player.M_state = Mario_state.Size_Dowm
-
-
-
-
-
-
 
 
     for ground in Grounds:
@@ -160,9 +149,19 @@ def update():
             player.is_Coll = True
             player.Coll_y = 80
 
+
+def exit():
+    global player , random_b ,stage1_Bk,Grounds,Platform,Mushrooms
+    del (player)
+    del (Platform)
+    del (Grounds)
+    del (stage1_Bk)
+    del (Mushrooms)
+def update():
+
+
     for block in Platform:
         block.update(player.scroll_x)
-
     for ground in Grounds:
         ground.update(player.scroll_x)
     player.update()
@@ -176,7 +175,7 @@ def update():
 
 
     Ui.update()
-
+    lateupdate()
 
 def draw():
     clear_canvas()
