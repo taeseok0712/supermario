@@ -2,7 +2,7 @@ from pico2d import *
 from C_mario import mario
 class C_Stage1_Bk:
     def __init__(self):
-        self.image =load_image('World 1-1_1.png')
+        self.image =load_image('World 1-1.png')
         self.scroll_x =0
 
 

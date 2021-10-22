@@ -40,7 +40,6 @@ class mario():
         self.time_cnt = 0
         self.vel = self.jump_power * self.jump_accel - self.gravity * (self.jump_accel ** 2) * 0.5
         self.Platform =[]
-
     def get_hitbox(self):
         return self.x - (self.size_x/2),self.y - (self.size_y/2), self.x + (self.size_x/2),self.y + (self.size_y/2)
 
@@ -140,33 +139,34 @@ class mario():
         if self.jump_on:
 
             self.jump_accel += 0.2
+            self.state = state.S_jump
             if self.jump_charge:
                 self.jump_power += 0.6
-            if (self.vel>= 0 and not self.Drop and self.jump_accel!=0):
+            if (self.vel>= 0 and not self.Drop ):
 
                 self.y += self.vel #올라가는중
-            if (self.vel < 0):
+            if (self.vel < 0 and self.state!=state.S_die):
                 self.Drop = True
-            if (self.vel > 0):
-                pass
+                self.state = state.S_Falling
 
             if((self.Drop and self.is_Coll) or self.vel<=0):
 
                 self.Drop =False
                 self.y += self.vel
-                if(self.is_Coll):
+                if(self.is_Coll and self.state == state.S_Falling):
 
                     self.y = self.Coll_y + self.size_y/2
 
                     self.jump_on =False
-                    if(self.jump_accel!=0):
-                        print("d")
-                        self.jump_accel = 0
+
+                    self.jump_accel = 0.2
                     self.jump_power = 10
                     self.state = state.S_idle
                     self.is_land = True
-        else:
-            pass
+
+            if(self.state ==state.S_die):
+                self.y -=1
+
 
 
     def collide(a, b):
@@ -185,32 +185,22 @@ class mario():
 
     def Late_update(self):
 
+
         for block in self.Platform:
-            if self.collide(block) and self.vel > 0 and not self.Drop:
+            if self.collide(block) and self.state == state.S_jump :
 
                 self.is_Coll = True
+
                 self.Drop = True
-                print(self.Drop)
+                self.state = state.S_die
+                print(self.state)
+
+
             else:
                 self.is_Coll=False
-                #print(self.Coll_y, self.is_Coll, self.Drop, self.jump_on)
         for block in self.Platform:
-            if self.collide(block) and self.vel < 0 or self.Drop:
+            if self.collide(block) and self.state != state.S_jump:
 
                 self.Coll_y = block.y + block.size_y/2
                 self.is_Coll = True
-                self.Drop = False
-
-
-
-
-
-
-
-
-
-
-
-
-
 

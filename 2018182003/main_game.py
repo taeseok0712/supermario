@@ -108,25 +108,27 @@ def enter():
     platform_list=['random',900,300,'random',1500,300]
     Monsters = []
     Platform =[Block('random',200,200),Block('brick',400,200)]
-    Platform.append(Block('random',-50,0))
-    Grounds =[Ground(1104)]
+
+    for i in range(100):
+        Platform.append(Block('brick',32*i,60))
+    Grounds =[]
 
 
 def lateupdate():
     x= 0
-
+    '''
     for ground in Grounds:
         if collide(player, ground):
             player.is_Coll = True
             player.Coll_y = 80
         else:
             player.is_Coll == False
+    '''
 
 
 
 
 
-'''
     for Mush in Mushrooms:
         if collide(player, Mush):
             Mushrooms.remove(Mush)
@@ -144,7 +146,7 @@ def lateupdate():
             if collide(player, monster)and monster.get_hitted()==False:
                 if (player.M_state == Mario_state.Super_mario):
                     player.M_state = Mario_state.Size_Dowm
-'''
+
 
 
 
