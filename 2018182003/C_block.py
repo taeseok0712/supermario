@@ -25,6 +25,7 @@ class Block:
         self.Flame_Change_Start = time.time();
         self.Flame_Change_End = time.time();
         self.move_on = False
+        self.mario=None
         if self.type == 'random':
             self.type_a = 1
         if self.type == 'brick':
@@ -74,6 +75,8 @@ class Block:
             if (self.M_state == Mario_state.mario and self.type_a == 0):
                 self.state = state_block.S_Idle
                 self.is_hit =False
+    def getMario(self,mario):
+        self.mario = mario
 
 
 
