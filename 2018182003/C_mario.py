@@ -69,7 +69,7 @@ class mario():
         if(self.M_state ==Mario_state.mario):
             self.size_y =32
         else:self.size_y = 64
-        self.Late_update()
+
 
     def move(self):
             if(self.move_dir == -1):
@@ -191,21 +191,21 @@ class mario():
     def Late_update(self):
         self.onBlock = 0
         self.underBlock = 0
-        print(self.Drop)
+
         for block in self.Platform:
             if self.collide(block):
                 self.onBlock +=1
                 self.Coll_y = block.y + block.size_y / 2
                 if self.jump_on and not self.Drop :
-                    self.y = block.y - block.size_y / 2 -self.size_y/2 -1
+                    self.y = block.y - block.size_y / 2 -self.size_y/2
                     self.underBlock +=1
 
 
 
         if self.underBlock>0:
             self.jump_on = False
-
             self.jump_accel = 0.2
+
 
         if self.onBlock == 0:
             self.is_Coll = False

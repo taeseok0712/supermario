@@ -148,7 +148,7 @@ def lateupdate():
                     player.M_state = Mario_state.Size_Dowm
 
 
-
+    player.Late_update()
 
 
 
@@ -167,6 +167,7 @@ def update():
     player.get_plat(Platform)
     for block in Platform:
         block.update(player.scroll_x)
+        block.mario = player
     for ground in Grounds:
         ground.update(player.scroll_x)
     player.update()
