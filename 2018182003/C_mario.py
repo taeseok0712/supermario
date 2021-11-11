@@ -1,6 +1,7 @@
 from pico2d import *
 from C_state import *
 import time
+#프레임타임 추가 , 상태패턴 추가해야함
 class mario():
     def __init__(self):
         self.M_State = Mario_state.mario
