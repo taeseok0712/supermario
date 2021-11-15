@@ -2,12 +2,12 @@ import game_framework
 import pico2d
 import start_state
 import title_state
-import main_game
-x= 800
+import main_state
+x= 1600
 y = 600
 
-pico2d.open_canvas(800,600)
+pico2d.open_canvas(x,y)
 
-game_framework.run(main_game)
+game_framework.run(main_state)
 
 pico2d.close_canvas()
