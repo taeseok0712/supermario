@@ -90,8 +90,6 @@ class RunState:
 
         mario.accel = mario.dir * ACCEL
 
-
-        print('O')
     def do(mario):
         #boy.frame = (boy.frame + 1) % 8
 

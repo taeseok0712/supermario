@@ -68,8 +68,7 @@ def handle_events():
             cur_select_block = 'pipe_RU'
         if event.type == SDL_KEYDOWN and event.key == SDLK_s:
             saveOn = True
-        if event.type == SDL_KEYUP and event.key == SDLK_s:
-            saveOn = False
+
         if event.type == SDL_MOUSEBUTTONDOWN:
             clickOn = True
             mouseX, mouseY = event.x, CANVAS_HEIGHT - 1 - event.y
@@ -82,7 +81,7 @@ def handle_events():
                     overlap = False
             if not overlap:
                 block_list.append(Block(cur_select_block, mouseX, mouseY))
-                game_world.add_objects(block_list, 1)
+                game_world.add_object(Block(cur_select_block, mouseX, mouseY), 1)
         if event.type == SDL_MOUSEBUTTONUP:
             clickOn = False
 
@@ -98,7 +97,7 @@ def handle_events():
                     overlap = False
             if not overlap:
                 block_list.append(Block(cur_select_block, mouseX, mouseY))
-                game_world.add_objects(block_list, 1)
+                game_world.add_object(Block(cur_select_block, mouseX, mouseY), 1)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_F5:
             game_framework.change_state(edit_play)
         else:

@@ -25,7 +25,7 @@ print(type(game_framework.frame_time))
 class Block:
     image = None
 
-    def __init__(self, type = None,x= None,y= None):
+    def __init__(self, type = None,x= None, y= None):
         self.type = type
         self.x = x
         self.y = y
@@ -58,7 +58,7 @@ class Block:
 
     def draw(self):
         self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x,self.y)
-        draw_rectangle(*self.get_bb())
+
 
 
     def get_bb(self):
