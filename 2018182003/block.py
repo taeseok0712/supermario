@@ -45,6 +45,14 @@ class Block:
             self.type_a = 1
         if self.type == 'brick':
             self.type_a = 0
+        if self.type == 'pipe_LB':
+            self.type_a = 2
+        if self.type == 'pipe_LU':
+            self.type_a = 3
+        if self.type == 'pipe_RB':
+            self.type_a = 4
+        if self.type == 'pipe_RU':
+            self.type_a = 5
         if Block.image == None:
             Block.image =load_image("Blocks.png")
 

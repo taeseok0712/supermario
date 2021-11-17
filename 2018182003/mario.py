@@ -24,7 +24,7 @@ CHARGE_POWER = 100
 MAX_CHARGE = 50 * PIXEL_PER_METER
 JUMP_POWER = 8 * PIXEL_PER_METER
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP,SHIFT_DOWN, SPACE , COLL_B , COLL_U ,FALL,LANDING= range(11)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP,SHIFT_DOWN, SPACE , COLL_B , COLL_U ,FALL,LANDING,LANDING_MOVE= range(12)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
@@ -172,7 +172,6 @@ class JumpState():
 class FallState():
 
     def enter(mario, event):
-        print("fallenter")
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -197,9 +196,12 @@ class FallState():
 
         mario.jumpTime += game_framework.frame_time
         mario.y += GRAVITY * mario.jumpTime * 0.5 * game_framework.frame_time
-        if(mario.y < 96):
-            mario.y = 96
-            mario.add_event(LANDING)
+        if(mario.y < 64):
+            mario.y = 64
+            if(mario.velocity == 0 ):
+                mario.add_event(LANDING)
+            else:
+                mario.add_event(LANDING_MOVE)
             mario.jumpTime = 0
 
 
@@ -219,13 +221,13 @@ next_state_table = {
     IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState,SHIFT_UP:IdleState},
     RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState,SHIFT_DOWN:JumpState,SHIFT_UP:RunState},
     JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState,SHIFT_DOWN:JumpState,SHIFT_UP:JumpState , FALL:FallState},
-    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState ,LANDING:IdleState}
+    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState ,LANDING:IdleState,LANDING_MOVE:RunState}
 }
 
 class Mario:
 
     def __init__(self):
-        self.x, self.y = 1600 // 2, 96
+        self.x, self.y = 1600 // 2, 64
         # Boy is only once created, so instance image loading is fine
         self.image = load_image('player_Mario.png')
         self.font = load_font('ENCR10B.TTF', 16)
@@ -276,7 +278,7 @@ class Mario:
         self.cur_state.draw(self)
         #self.font.draw(self.x - 60, self.y + 50, '(Time: %3.2f)' % get_time(), (255, 255, 0))
         #fill here
-        debug_print(' State' + self.cur_state.__name__ )
+        debug_print(' vel' + str(self.velocity) )
         draw_rectangle(*self.get_bb())
 
 
