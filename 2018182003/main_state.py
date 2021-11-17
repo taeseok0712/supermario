@@ -7,6 +7,7 @@ import game_framework
 import game_world
 from mario import Mario
 from stage1BG import Stage1BG
+from block import Block
 name = "MainState"
 
 mario = None
@@ -31,6 +32,10 @@ def enter():
     global backGround
     backGround = Stage1BG()
     game_world.add_object(backGround, 0)
+
+    global block
+    block = Block('brick',400,80)
+    game_world.add_object(block, 1)
 
 
 
