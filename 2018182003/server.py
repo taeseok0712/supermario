@@ -1,0 +1,2 @@
+mario = None
+blocks = []

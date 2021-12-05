@@ -11,7 +11,7 @@ from mario import Mario
 from stage1BG import Stage1BG
 from block import Block
 name = "EditPlay"
-
+import server
 mario = None
 backGround = None
 
@@ -29,9 +29,9 @@ def collide(a, b):
 def enter():
     read_file()
     print("read")
-    global mario
-    mario = Mario()
-    game_world.add_object(mario, 1)
+
+    server.mario = Mario()
+    game_world.add_object(server.mario, 1)
 
     global backGround
     backGround = Stage1BG()
@@ -61,7 +61,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
         else:
-            mario.handle_event(event)
+            server.mario.handle_event(event)
 
 
 def update():

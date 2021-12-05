@@ -1,6 +1,6 @@
 import game_framework
 from pico2d import *
-
+import server
 import time
 
 import game_world
@@ -57,13 +57,13 @@ class Block:
             Block.image =load_image("Blocks.png")
 
     def draw(self):
-        self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x,self.y)
+        self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x-server.mario.scrollX,self.y)
 
-
+        draw_rectangle(*self.get_bb())
 
     def get_bb(self):
 
-        return self.x - (self.size_x/2),self.y - (self.size_y/2), self.x + (self.size_x/2),self.y + (self.size_y/2)
+        return self.x - (self.size_x/2)-server.mario.scrollX,self.y - (self.size_y/2), self.x + (self.size_x/2)-server.mario.scrollX,self.y + (self.size_y/2)
 
     def update(self):
         pass

@@ -4,7 +4,9 @@ import edit_play
 from block import Block
 from pico2d import *
 import ctypes
-
+import server
+from stage1BG import Stage1BG
+from mario import Mario
 class Point(ctypes.Structure):
     _fields_ = [("x", ctypes.c_int),
                 ("y", ctypes.c_int)]
@@ -12,17 +14,23 @@ CANVAS_HEIGHT =600
 
 
 
+
 name = "EditState"
 image = None
 clickOn = False
 saveOn = False
+keyDown = False
 mouseX,mouseY = 0,0
+ScrollX = 0
 
 cur_select_block = 'brick'
 def enter():
-    global image
-    image = load_image('World 1-1.png')
 
+    global backGround
+    backGround = Stage1BG()
+    game_world.add_object(backGround, 0)
+
+    server.mario = Mario()
     global block_list
     block_list = []
 
@@ -40,15 +48,19 @@ def exit():
                 map_data_file.close()
     del (image)
     del (block_list)
+    server.mario = None
+    if server.mario == None:
+        print('delClear')
 
 
 def handle_events():
     events = get_events()
-
+    global keyDown
     global clickOn
     global saveOn
     global cur_select_block
     global block_list
+    global ScrollX
     overlap = False
 
     for event in events:
@@ -68,36 +80,43 @@ def handle_events():
             cur_select_block = 'pipe_RU'
         if event.type == SDL_KEYDOWN and event.key == SDLK_s:
             saveOn = True
+        if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
+            server.mario.scrollX += 800
+        if event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
+            server.mario.scrollX -= 800
 
-        if event.type == SDL_MOUSEBUTTONDOWN:
-            clickOn = True
+        if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_RIGHT:
+
             mouseX, mouseY = event.x, CANVAS_HEIGHT - 1 - event.y
             mouseX, mouseY = setPos(mouseX, mouseY, 32)
             for i in block_list:
-                if i.x == mouseX and i.y == mouseY:
+                if i.x == mouseX + server.mario.scrollX and i.y == mouseY:
                     overlap = True
                     break
                 else:
                     overlap = False
             if not overlap:
-                block_list.append(Block(cur_select_block, mouseX, mouseY))
-                game_world.add_object(Block(cur_select_block, mouseX, mouseY), 1)
-        if event.type == SDL_MOUSEBUTTONUP:
+                block_list.append(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY))
+                game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
+
+        if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+            clickOn = True
+        if event.type == SDL_MOUSEBUTTONUP and event.button == SDL_BUTTON_LEFT:
             clickOn = False
 
+
         if event.type ==SDL_MOUSEMOTION and clickOn:
-            print(clickOn)
             mouseX, mouseY = event.x, CANVAS_HEIGHT - 1 - event.y
-            mouseX, mouseY = setPos(mouseX, mouseY, 32)
+            mouseX, mouseY = setPos(mouseX , mouseY, 32)
             for i in block_list:
-                if i.x == mouseX and i.y == mouseY:
+                if i.x == mouseX + server.mario.scrollX and i.y == mouseY:
                     overlap = True
                     break
                 else:
                     overlap = False
             if not overlap:
-                block_list.append(Block(cur_select_block, mouseX, mouseY))
-                game_world.add_object(Block(cur_select_block, mouseX, mouseY), 1)
+                block_list.append(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY))
+                game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_F5:
             game_framework.change_state(edit_play)
         else:
@@ -127,7 +146,7 @@ def setPos(x,y,size):
     elif y%size <= size/2:
         py = y - y%size
 
-    print(px,py)
+
     return px,py
 
 
