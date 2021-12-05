@@ -94,7 +94,7 @@ def read_file():
             obj_type = data_map_obj[0]
             obj_xPos = float(data_map_obj[1])
             obj_yPos = float(data_map_obj[2])
-            print(data_map_obj[1])
+
 
             global block
             block = Block(obj_type, obj_xPos, obj_yPos)

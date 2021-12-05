@@ -14,7 +14,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 # Boy Action Speed
 TIME_PER_ACTION = 0.3
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-
+FAllING_POWER =10
 
 GRAVITY = -9.8 * PIXEL_PER_METER
 # m/s^2
@@ -38,7 +38,7 @@ key_event_table = {
 
 
 # Boy States
-print(type(game_framework.frame_time))
+
 
 
 class IdleState:
@@ -193,7 +193,7 @@ class FallState():
         mario.move()
 
         mario.jumpTime += game_framework.frame_time
-        mario.y += GRAVITY * mario.jumpTime * 0.5 * game_framework.frame_time
+        mario.y += FAllING_POWER *GRAVITY * mario.jumpTime * 0.5 * game_framework.frame_time
         if(mario.y < 64):
             mario.y = 64
             if(mario.velocity == 0 ):
