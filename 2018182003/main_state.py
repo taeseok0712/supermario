@@ -31,7 +31,9 @@ def enter():
     server.ui = C_UI_()
     game_world.add_object(server.ui,0)
     read_file()
-    game_world.add_objects(server.blocks, 0)
+    game_world.add_objects(server.blocks, 1)
+
+
 
 
 
@@ -64,6 +66,12 @@ def handle_events():
 def update():
     for game_object in game_world.all_objects():
         game_object.update()
+    for coin in server.coin:
+        if coin.remove:
+
+            server.coin.remove(coin)
+            print(server.coin)
+            game_world.remove_object(coin)
 
 
 

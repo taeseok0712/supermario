@@ -6,6 +6,7 @@ import server
 import time
 import game_world
 from mushroom import MushRoom
+from coin import Coin
 
 IDLE, HITTING, BROKING, BROKEN, HIT = range(5)
 
@@ -83,7 +84,11 @@ class Block:
             self.state = HITTING
             if self.item == 1:
                 server.item.append(MushRoom(self.x, self.y + self.size_y))
-            
+            else:
+                coin = Coin(self.x, self.y + self.size_y)
+
+                server.coin.append(Coin(self.x, self.y + self.size_y))
+                server.ui.coin += 1
             self.add = True
             self.move_on = True
 
@@ -101,8 +106,12 @@ class Block:
             self.y -= 5
             self.state = BROKEN
             if self.add == True:
+                if self.item == 1:
+                    game_world.add_objects(server.item,0)
+                else:
+                    game_world.add_objects(server.coin,0)
 
-                game_world.add_objects(server.item,0)
+
                 self.add = False
             if (self.type_a == 0):
                 self.state = IDLE

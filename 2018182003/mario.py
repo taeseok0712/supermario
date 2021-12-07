@@ -25,8 +25,11 @@ CHARGE_POWER = 100
 MAX_CHARGE = 50 * PIXEL_PER_METER
 JUMP_POWER = 8 * PIXEL_PER_METER
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP,SHIFT_DOWN, SPACE , COLL_B , COLL_U ,FALL,LANDING,LANDING_MOVE= range(12)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP,SHIFT_DOWN, SPACE , COLL_B , COLL_U ,FALL,LANDING,LANDING_MOVE,GROWING,GROW_TIMER= range(14)
 Idle, Jump , Land , Fall , Run= range(5)
+
+MARIO,SUPER,FIRE = range(3)
+
 eventName = ['RIGHT_DOWN', 'LEFT_DOWN', 'RIGHT_UP', 'LEFT_UP', 'SHIFT_UP','SHIFT_DOWN', 'SPACE' , 'COLL_B' , 'COLL_U' ,'FALL','LANDING','LANDING_MOVE']
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
@@ -68,7 +71,7 @@ class IdleState:
 
     def draw(mario):
         if mario.dir == 1:
-            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x,mario.y)
+            mario.image.clip_draw(32 * int(mario.frame), mario.sizeY, mario.sizeX, mario.sizeY, mario.x,mario.y)
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 
@@ -107,13 +110,19 @@ class RunState:
 
     def draw(mario):
         if mario.dir == 1:
-            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x, mario.y)
+            mario.image.clip_draw(32 * int(mario.frame), mario.sizeY, mario.sizeX, mario.sizeY, mario.x, mario.y)
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 
 class GrowState:
 
     def enter(mario, event):
+        if mario.grow == False:
+            mario.image = load_image('Mario_grow.png')
+            mario.time = 100
+            mario.sizeY = 64
+            mario.y +=16
+            mario.grow = True
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -129,14 +138,16 @@ class GrowState:
     def exit(mario, event):
         if event == SPACE:
             mario.fire_ball()
-
         mario.accel = mario.dir * ACCEL
+        mario.mario = SUPER
 
     def do(mario):
         mario.move()
+        mario.time -= 1
+        if mario.time == 0:
+            mario.add_event(GROW_TIMER)
+            mario.image = load_image('Super_mario.png')
 
-        if(mario.frame < 1):
-            mario.frame = 1
         mario.frame = (mario.frame + mario.FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
 
 
@@ -144,7 +155,7 @@ class GrowState:
 
     def draw(mario):
         if mario.dir == 1:
-            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x, mario.y)
+            mario.image.clip_draw(32 * int(mario.frame), mario.sizeY, mario.sizeX, mario.sizeY, mario.x, mario.y)
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 class JumpState():
@@ -201,6 +212,10 @@ class JumpState():
                 mario.setX()
 
                 block.setMove()
+                if mario.mario != MARIO and block.type =='brick':
+                    server.blocks.remove(block)
+                    game_world.remove_object(block)
+
                 mario.add_event(FALL)
 
 
@@ -208,7 +223,7 @@ class JumpState():
 
     def draw(mario):
         if mario.dir == 1:
-            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x, mario.y)
+            mario.image.clip_draw(32 * int(mario.frame), mario.sizeY, mario.sizeX, mario.sizeY, mario.x, mario.y)
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 
@@ -246,7 +261,7 @@ class FallState():
             if collide(mario, block):
 
                 if (mario.y < block.y):
-                    mario.y = block.y+block.size_y
+                    mario.y = block.y+block.size_y/2 +mario.sizeY/2
                     if (mario.velocity == 0):
                         mario.add_event(LANDING)
                     else:
@@ -256,7 +271,7 @@ class FallState():
 
     def draw(mario):
         if mario.dir == 1:
-            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x, mario.y)
+            mario.image.clip_draw(32 * int(mario.frame), mario.sizeY, mario.sizeX, mario.sizeY, mario.x, mario.y)
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 
@@ -267,10 +282,11 @@ class FallState():
 
 
 next_state_table = {
-    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState,SHIFT_UP:IdleState,FALL:FallState,LANDING:IdleState},
-    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState,SHIFT_DOWN:JumpState,SHIFT_UP:RunState,LANDING_MOVE:RunState,FALL:FallState,LANDING:IdleState},
-    JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState,SHIFT_DOWN:JumpState,SHIFT_UP:JumpState , FALL:FallState},
-    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState ,LANDING:IdleState,LANDING_MOVE:RunState,FALL:FallState}
+    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState,SHIFT_UP:IdleState,FALL:FallState,LANDING:IdleState,GROWING:GrowState},
+    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState,SHIFT_DOWN:JumpState,SHIFT_UP:RunState,LANDING_MOVE:RunState,FALL:FallState,LANDING:IdleState,GROWING:GrowState},
+    JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState,SHIFT_DOWN:JumpState,SHIFT_UP:JumpState , FALL:FallState,GROWING:GrowState},
+    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState ,LANDING:IdleState,LANDING_MOVE:RunState,FALL:FallState,GROWING:GrowState},
+    GrowState: {RIGHT_UP: GrowState, LEFT_UP: GrowState, LEFT_DOWN: GrowState, RIGHT_DOWN: GrowState, SHIFT_DOWN: GrowState, SHIFT_UP: GrowState ,LANDING:GrowState,LANDING_MOVE:GrowState,FALL:GrowState,GROWING:GrowState,GROW_TIMER:IdleState}
 }
 
 class Mario:
@@ -278,6 +294,7 @@ class Mario:
     def __init__(self):
         self.x, self.y = 100, 64
         self.state = Idle
+        self.mario = MARIO #마리오의 상태 (작은,슈퍼,파이어)
         self.image = load_image('player_Mario.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
@@ -301,6 +318,8 @@ class Mario:
         self.jumpTime = 0
         self.jumpAccel = 0.2
         self.onGround = True
+        self.grow = False
+        self.time = 0
         self.privY = self.y
     def get_bb(self):
         return self.x - (self.sizeX/2) + 5,self.y - (self.sizeY/2), self.x - 5+ (self.sizeX/2),self.y + (self.sizeY/2)
@@ -347,6 +366,12 @@ class Mario:
         self.gravity()
         if self.isColl == False and self.jumpOn == False:
             self.add_event(FALL)
+        for item in server.item:
+            if collide(self,item):
+                server.item.remove(item)
+                game_world.remove_object(item)
+                if self.mario == MARIO:
+                    self.add_event(GROWING)
 
     def draw(self):
         self.cur_state.draw(self)
@@ -360,6 +385,9 @@ class Mario:
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_g:
+            if self.mario == MARIO:
+                self.add_event(GROWING)
     def setX(self):
         self.y -= 5
 
