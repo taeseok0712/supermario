@@ -1,17 +1,18 @@
 import game_framework
 from pico2d import *
 import server
-
+import random
 import game_world
 
-# Boy Run Speed
+
+
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 20.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-# Boy Action Speed
+
 TIME_PER_ACTION = 0.3
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FAllING_POWER =10
@@ -25,6 +26,7 @@ MAX_CHARGE = 50 * PIXEL_PER_METER
 JUMP_POWER = 8 * PIXEL_PER_METER
 # Boy Event
 RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP,SHIFT_DOWN, SPACE , COLL_B , COLL_U ,FALL,LANDING,LANDING_MOVE= range(12)
+Idle, Jump , Land , Fall , Run= range(5)
 eventName = ['RIGHT_DOWN', 'LEFT_DOWN', 'RIGHT_UP', 'LEFT_UP', 'SHIFT_UP','SHIFT_DOWN', 'SPACE' , 'COLL_B' , 'COLL_U' ,'FALL','LANDING','LANDING_MOVE']
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
@@ -44,6 +46,7 @@ key_event_table = {
 class IdleState:
 
     def enter(mario, event):
+        mario.state = Idle
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -73,6 +76,7 @@ x = 0
 class RunState:
 
     def enter(mario, event):
+        mario.state = Run
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -92,15 +96,12 @@ class RunState:
         mario.accel = mario.dir * ACCEL
 
     def do(mario):
-        #boy.frame = (boy.frame + 1) % 8
-
         mario.move()
 
         if(mario.frame < 1):
             mario.frame = 1
         mario.frame = (mario.frame + mario.FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
 
-        #print( game_framework.frame_time)
 
 
 
@@ -110,10 +111,47 @@ class RunState:
         else:
             mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 
+class GrowState:
+
+    def enter(mario, event):
+        if event == RIGHT_DOWN:
+            mario.velocity += RUN_SPEED_PPS
+        elif event == LEFT_DOWN:
+            mario.velocity -= RUN_SPEED_PPS
+        elif event == RIGHT_UP:
+            mario.velocity -= RUN_SPEED_PPS
+        elif event == LEFT_UP:
+            mario.velocity += RUN_SPEED_PPS
+        mario.dir = clamp(-1, mario.velocity, 1)
+        mario.accel = mario.dir * ACCEL
+        mario.isColl = False
+
+    def exit(mario, event):
+        if event == SPACE:
+            mario.fire_ball()
+
+        mario.accel = mario.dir * ACCEL
+
+    def do(mario):
+        mario.move()
+
+        if(mario.frame < 1):
+            mario.frame = 1
+        mario.frame = (mario.frame + mario.FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
+
+
+
+
+    def draw(mario):
+        if mario.dir == 1:
+            mario.image.clip_draw(32 * int(mario.frame), 32, mario.sizeX, mario.sizeY, mario.x, mario.y)
+        else:
+            mario.image.clip_draw(32 * int(mario.frame), 0, mario.sizeX, mario.sizeY, mario.x,mario.y)
 class JumpState():
 
     def enter(mario, event):
-        print("jumpenter")
+        mario.state = Jump
+        mario.onGround = False
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -159,11 +197,11 @@ class JumpState():
 
         for block in server.blocks:
             if collide(mario, block):
-                mario.add_event(FALL)
                 mario.jumpOn = False
+                mario.setX()
 
-
-
+                block.setMove()
+                mario.add_event(FALL)
 
 
 
@@ -177,6 +215,8 @@ class JumpState():
 class FallState():
 
     def enter(mario, event):
+        mario.state = Fall
+        mario.onGround = False
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -227,8 +267,8 @@ class FallState():
 
 
 next_state_table = {
-    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState,SHIFT_UP:IdleState,FALL:FallState},
-    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState,SHIFT_DOWN:JumpState,SHIFT_UP:RunState,LANDING_MOVE:RunState,FALL:FallState},
+    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState,SHIFT_UP:IdleState,FALL:FallState,LANDING:IdleState},
+    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState,SHIFT_DOWN:JumpState,SHIFT_UP:RunState,LANDING_MOVE:RunState,FALL:FallState,LANDING:IdleState},
     JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState,SHIFT_DOWN:JumpState,SHIFT_UP:JumpState , FALL:FallState},
     FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState ,LANDING:IdleState,LANDING_MOVE:RunState,FALL:FallState}
 }
@@ -237,10 +277,11 @@ class Mario:
 
     def __init__(self):
         self.x, self.y = 100, 64
-        # Boy is only once created, so instance image loading is fine
+        self.state = Idle
         self.image = load_image('player_Mario.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
+        self.collcnt = 0
         self.scrollX = 0
         self.velocity = 0
         self.frame = 0
@@ -259,9 +300,10 @@ class Mario:
         self.jumpPower = JUMP_POWER
         self.jumpTime = 0
         self.jumpAccel = 0.2
+        self.onGround = True
         self.privY = self.y
     def get_bb(self):
-        return self.x - (self.sizeX/2),self.y - (self.sizeY/2), self.x + (self.sizeX/2),self.y + (self.sizeY/2)
+        return self.x - (self.sizeX/2) + 5,self.y - (self.sizeY/2), self.x - 5+ (self.sizeX/2),self.y + (self.sizeY/2)
 
 
     def fire_ball(self):
@@ -271,10 +313,14 @@ class Mario:
     def move(self):
         if (self.accel > -MAX_ACCEL and self.accel< MAX_ACCEL):
             self.accel += self.accel *game_framework.frame_time
-
-        self.x += self.velocity * game_framework.frame_time + self.accel
-        self.x = clamp(25,self.x,650)
-        if self.x == 650:
+        if self.collcnt <= 2:
+            self.x += self.velocity * game_framework.frame_time + self.accel
+        if self.collcnt > 2 and self.dir == 1:
+            self.x -= 3
+        if self.collcnt > 2 and self.dir == -1:
+            self.x += 3
+        self.x = clamp(25,self.x,550)
+        if self.x == 550:
             if (self.scrollX + self.velocity * game_framework.frame_time + self.accel < 5950):
                 self.scrollX += self.velocity * game_framework.frame_time + self.accel
         if self.x == 25:
@@ -297,17 +343,14 @@ class Mario:
                 print("curState:", self.cur_state.__name__, "event:", eventName[event])
                 exit(-1)
             self.cur_state.enter(self, event)
-        for block in server.blocks:
-            if collide(self, block):
-                self.isColl = True
-                break
-            if not collide(self, block):
-                self.isColl = False
 
+        self.gravity()
+        if self.isColl == False and self.jumpOn == False:
+            self.add_event(FALL)
 
     def draw(self):
         self.cur_state.draw(self)
-        #self.font.draw(self.x - 60, self.y + 50, '(Time: %3.2f)' % get_time(), (255, 255, 0))
+
         #fill here
         debug_print(' scrollX' + str(self.scrollX) )
         draw_rectangle(*self.get_bb())
@@ -317,6 +360,19 @@ class Mario:
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
+    def setX(self):
+        self.y -= 5
+
+    def gravity(self):
+        self.collcnt = 0
+        for block in server.blocks:
+            if collide(self, block):
+                self.collcnt += 1
+        if self.collcnt == 0:
+            self.isColl = False
+        else:
+
+            self.isColl = True
 
 
 def collide(a, b):
@@ -327,13 +383,3 @@ def collide(a, b):
     if top_a < bottom_b: return False
     if bottom_a > top_b: return False
     return True
-
-def fall_collide(a, b):
-    left_a, bottom_a, right_a, top_a = a.get_bb()
-    left_b, bottom_b, right_b, top_b = b.get_bb()
-
-    if top_a < bottom_b: return False
-    if bottom_a > top_b: return False
-    return True
-
-

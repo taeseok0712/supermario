@@ -10,6 +10,7 @@ from mario import Mario
 from stage1BG import Stage1BG
 from block import Block
 name = "MainState"
+from ui import C_UI_
 
 mario = None
 backGround = None
@@ -27,7 +28,10 @@ def enter():
     backGround = Stage1BG()
     game_world.add_object(backGround, 0)
 
+    server.ui = C_UI_()
+    game_world.add_object(server.ui,0)
     read_file()
+    game_world.add_objects(server.blocks, 0)
 
 
 
@@ -50,6 +54,9 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
+            for block in server.blocks:
+                block.y += 16
         else:
             server.mario.handle_event(event)
 
@@ -58,14 +65,6 @@ def update():
     for game_object in game_world.all_objects():
         game_object.update()
 
-    # fill here for collision check
-
-
-
-
-
-
-
 
 
 def draw():
@@ -73,6 +72,15 @@ def draw():
     for game_object in game_world.all_objects():
         game_object.draw()
     update_canvas()
+
+def collide(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+    if left_a > right_b: return False
+    if right_a < left_b: return False
+    if top_a < bottom_b: return False
+    if bottom_a > top_b: return False
+    return True
 
 def read_file():
     obj_xPos, obj_yPos = 0, 0
@@ -93,12 +101,10 @@ def read_file():
             obj_xPos = float(data_map_obj[1])
             obj_yPos = float(data_map_obj[2])
 
-
-
             global blocks
             blocks = Block(obj_type, obj_xPos, obj_yPos)
             server.blocks.append(Block(obj_type, obj_xPos, obj_yPos))
-            game_world.add_object(blocks, 0)
+
         except:
             break
 
