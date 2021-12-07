@@ -12,6 +12,7 @@ from block import Block
 name = "MainState"
 from ui import C_UI_
 from Gumba import Gumba
+from turtle import Turtle
 import title_state
 mario = None
 backGround = None
@@ -37,6 +38,9 @@ def enter():
 
     server.gumba.append(Gumba(750,64))
     game_world.add_objects(server.gumba,1)
+
+    server.turtle.append(Turtle(650,64))
+    game_world.add_objects(server.turtle, 1)
 
 
 
@@ -76,7 +80,6 @@ def update():
         game_object.update()
     for coin in server.coin:
         if coin.remove:
-
             server.coin.remove(coin)
             print(server.coin)
             game_world.remove_object(coin)

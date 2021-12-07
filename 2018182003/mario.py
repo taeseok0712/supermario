@@ -443,6 +443,29 @@ class Mario:
             if gumba.dead:
                 server.gumba.remove(gumba)
                 game_world.remove_object(gumba)
+        for turtle in server.turtle:
+            if collide(self,turtle):
+                if self.state == Fall and not turtle.ishitted and not self.dead:
+                    turtle.ishitted = True
+                    self.catchY = self.y
+                    self.catchMonster = True
+                if turtle.canKick and turtle.ishitted and not turtle.shooton:
+                    turtle.dir = self.dir
+                    turtle.shooton = True
+                else:
+                    if not turtle.ishitted and not turtle.canKick:
+                        if self.mario != MARIO:
+                            self.dmg = True
+                            self.add_event(CHANGE)
+                        if self.mario == MARIO:
+                            self.hitY = self.y
+                            self.dmg = True
+                            self.dead = True
+
+            if turtle.dead:
+                server.turtle.remove(turtle)
+                game_world.remove_object(turtle)
+
         if self.mario == MARIO and self.dmg:
             self.add_event(DEAD)
 

@@ -20,25 +20,34 @@ GRAVITY = -9.8 * PIXEL_PER_METER
 # m/s^2
 ACCEL = 0.5
 MAX_ACCEL = 3
-
-class Gumba:
+BLOCK_SIZE=32
+class Turtle:
 
     def __init__(self,cx,cy):
         self.x = cx
-        self.y = cy
+        self.y = cy + BLOCK_SIZE / 2
         self.collcnt = 0
+        self.canKick = False
         self.size_x = 32
-        self.size_y = 32
+        self.size_y = 48
+        self.shooton = False
+        self.dir = -1
+        self.maxX = self.x + 100
+        self.minX = self.x - 100
         self.vel = RUN_SPEED_PPS
         self.frame = 0
         self.ishitted = False
         self.dead = False
+        self.distance = 100
         self.Flame_Change_Start = time.time()
         self.Flame_Change_End = time.time()
-        self.image = load_image("Gumba.png")
+        self.image = load_image("turtle.png")
 
     def draw(self):
-            self.image.clip_draw(16*int(self.frame), 0, 16, 16, self.x - server.mario.scrollX, self.y, 32, 32)
+            if self.dir == 1:
+                self.image.clip_draw(16*int(self.frame), 0, 16, 24, self.x - server.mario.scrollX, self.y, self.size_x, self.size_y)
+            if self.dir == -1:
+                self.image.clip_draw(16*int(self.frame), 24, 16, 24, self.x - server.mario.scrollX, self.y, self.size_x, self.size_y)
 
             draw_rectangle(*self.get_bb())
 
@@ -48,27 +57,31 @@ class Gumba:
     def update(self):
         self.Flame_Change_End = time.time()
         if self.ishitted== False:
-            if self.Flame_Change_End - self.Flame_Change_Start > 0.1:
-                self.Flame_Change_Start = time.time();
+
 
             self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
-            if self.x - server.mario.scrollX < 800:
+
+            if self.x - server.mario.scrollX < 800 and not self.shooton:
                 self.move()
 
-        if self.ishitted:
+        if self.ishitted and not self.canKick:
             self.frame = 2
-            self.speed = 0
-
-            if self.Flame_Change_End - self.Flame_Change_Start > 0.2:
-
-                self.dead = True
+            self.size_y = 32
+            self.y -= 16
+            self.canKick = True
+        if self.shooton:
+            self.shoot()
 
     def move(self):
         self.gravity()
-        if self.collcnt <= 2:
-            self.x -= self.vel * game_framework.frame_time
-        if self.collcnt > 2:
-            self.x += 3
+        if not self.ishitted:
+            if self.collcnt <= 2:
+                self.x += self.vel * game_framework.frame_time * self.dir
+                if self.x > self.maxX or self.x < self.minX:
+                    self.dir = self.dir * -1
+
+        if self.collcnt > 2 :
+            self.x -= 3 +self.dir
         if self.collcnt == 0:
             self.y -= self.vel * 2 * game_framework.frame_time
         if self.y < 0:
@@ -85,6 +98,21 @@ class Gumba:
             self.isColl = False
         else:
             self.isColl = True
+
+    def shoot(self):
+        self.gravity()
+        print(self.collcnt)
+        if self.collcnt <= 2:
+            self.x += self.vel * game_framework.frame_time * self.dir * 5
+        if self.collcnt >= 3:
+            self.dead = True
+        if self.collcnt == 0:
+            self.y -= self.vel * 2 * game_framework.frame_time
+        if self.y < 0:
+            self.dead = True
+        if (self.x - server.mario.scrollX > 800 or self.x - server.mario.scrollX < 0) and self.shooton:
+            self.dead = True
+
 
 
 def collide(a, b):
