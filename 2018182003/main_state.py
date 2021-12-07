@@ -11,7 +11,8 @@ from stage1BG import Stage1BG
 from block import Block
 name = "MainState"
 from ui import C_UI_
-
+from Gumba import Gumba
+import title_state
 mario = None
 backGround = None
 
@@ -34,13 +35,20 @@ def enter():
     game_world.add_objects(server.blocks, 1)
 
 
+    server.gumba.append(Gumba(750,64))
+    game_world.add_objects(server.gumba,1)
+
+
+
 
 
 
 
 def exit():
     game_world.clear()
-
+    server.clear()
+    for game_object in game_world.all_objects():
+        print(game_object)
 def pause():
     pass
 
@@ -72,6 +80,15 @@ def update():
             server.coin.remove(coin)
             print(server.coin)
             game_world.remove_object(coin)
+    if server.mario.scrollX > 5500:
+        game_framework.change_state(title_state)
+    if server.ui.time < 0:
+        game_framework.change_state(title_state)
+    if server.mario.gameEnd:
+        game_framework.change_state(title_state)
+
+
+
 
 
 
