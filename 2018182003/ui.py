@@ -1,7 +1,9 @@
 from pico2d import *
 import time
+import server
+TIME_LIMIT = 150
 
-TIME_LIMIT = 5000
+
 class C_UI_():
 
     def __init__(self):
@@ -27,7 +29,7 @@ class C_UI_():
         self.font.draw(665 , 520,str(self.time), (255, 255, 255))
 
         self.font.draw(295, 525, str(self.coin), (255, 255, 255))
-        self.font.draw(465, 520, str(1), (255, 255, 255))
+        self.font.draw(465, 520, str(server.stage), (255, 255, 255))
         self.font.draw(510, 520, str(self.stage), (255, 255, 255))
         #draw_rectangle(255,530,271,514)
         # draw_rectangle(0,0,800 -self.scroll_x,80)

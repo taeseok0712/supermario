@@ -9,7 +9,7 @@ class MushRoom:
         self.x = x
         self.y = y
         self.size_x = 32
-        self.size_y = 48
+        self.size_y = 32
         self.is_coll = False
         self.frame = 0
         self.scroll_x = 0;

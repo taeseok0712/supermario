@@ -1,4 +1,5 @@
 mario = None
+stage = None
 blocks = []
 item = []
 ui = None

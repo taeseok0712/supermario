@@ -3,9 +3,12 @@ import game_world
 import edit_play
 from block import Block
 from pico2d import *
+from Gumba import Gumba
+from turtle import Turtle
 import ctypes
 import server
 from stage1BG import Stage1BG
+from stage2BG import Stage2BG
 from mario import Mario
 class Point(ctypes.Structure):
     _fields_ = [("x", ctypes.c_int),
@@ -27,7 +30,7 @@ cur_select_block = 'brick'
 def enter():
 
     global backGround
-    backGround = Stage1BG()
+    backGround = Stage2BG()
     game_world.add_object(backGround, 0)
 
     server.mario = Mario()
@@ -38,6 +41,8 @@ def enter():
 def exit():
     global image
     global block_list
+    global monster_list
+    global coin_list
     if saveOn:
         map_data_file = open('editmap.txt', 'w')
         for i in block_list:
@@ -78,6 +83,14 @@ def handle_events():
             cur_select_block = 'pipe_RB'
         if event.type == SDL_KEYDOWN and event.key == SDLK_6:
             cur_select_block = 'pipe_RU'
+        if event.type == SDL_KEYDOWN and event.key == SDLK_7:
+            cur_select_block = 'ground'
+        if event.type == SDL_KEYDOWN and event.key == SDLK_8:
+            cur_select_block = 'hard_brick'
+        if event.type == SDL_KEYDOWN and event.key == SDLK_F1:
+            cur_select_block = 'gumba'
+        if event.type == SDL_KEYDOWN and event.key == SDLK_F2:
+            cur_select_block = 'turtle'
         if event.type == SDL_KEYDOWN and event.key == SDLK_s:
             saveOn = True
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
@@ -97,7 +110,8 @@ def handle_events():
                     overlap = False
             if not overlap:
                 block_list.append(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY))
-                game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
+                if cur_select_block != 'gumba' and cur_select_block != 'turtle':
+                    game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
 
         if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             clickOn = True
@@ -116,7 +130,8 @@ def handle_events():
                     overlap = False
             if not overlap:
                 block_list.append(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY))
-                game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
+                if cur_select_block != 'gumba' and cur_select_block != 'turtle':
+                    game_world.add_object(Block(cur_select_block, mouseX + server.mario.scrollX, mouseY), 1)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_F5:
             game_framework.change_state(edit_play)
         else:

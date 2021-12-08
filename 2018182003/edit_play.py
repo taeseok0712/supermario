@@ -1,41 +1,47 @@
-import game_framework
-import game_world
-from block import Block
-from pico2d import *
-import ctypes
+import random
+import json
+import os
 
 from pico2d import *
 import game_framework
 import game_world
-from mario import Mario
-from stage1BG import Stage1BG
-from block import Block
-name = "EditPlay"
 import server
+from mario import Mario
+from stage2BG import Stage2BG
+from block import Block
+name = "MainState"
+from ui import C_UI_
+from Gumba import Gumba
+from turtle import Turtle
+import title_state
 mario = None
 backGround = None
 
 
-def collide(a, b):
-    left_a, bottom_a, right_a, top_a = a.get_bb()
-    left_b, bottom_b, right_b, top_b = b.get_bb()
-    if left_a > right_b: return False
-    if right_a < left_b: return False
-    if top_a < bottom_b: return False
-    if bottom_a > top_b: return False
-    return True
+
 
 
 def enter():
-    read_file()
-    print("read")
 
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
 
     global backGround
-    backGround = Stage1BG()
+    backGround = Stage2BG()
     game_world.add_object(backGround, 0)
+
+    server.ui = C_UI_()
+    game_world.add_object(server.ui,0)
+    read_file()
+    game_world.add_objects(server.blocks, 1)
+
+
+    server.gumba.append(Gumba(750,64))
+    game_world.add_objects(server.gumba,1)
+
+    server.turtle.append(Turtle(650,64))
+    game_world.add_objects(server.turtle, 1)
+
 
 
 
@@ -44,7 +50,9 @@ def enter():
 
 def exit():
     game_world.clear()
-
+    server.clear()
+    for game_object in game_world.all_objects():
+        print(game_object)
 def pause():
     pass
 
@@ -60,6 +68,9 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
+            for block in server.blocks:
+                block.y += 16
         else:
             server.mario.handle_event(event)
 
@@ -67,6 +78,20 @@ def handle_events():
 def update():
     for game_object in game_world.all_objects():
         game_object.update()
+    for coin in server.coin:
+        if coin.remove:
+            server.coin.remove(coin)
+            print(server.coin)
+            game_world.remove_object(coin)
+    if server.mario.scrollX > 5500:
+        game_framework.change_state(title_state)
+    if server.ui.time < 0:
+        game_framework.change_state(title_state)
+    if server.mario.gameEnd:
+        game_framework.change_state(title_state)
+
+
+
 
 
 
@@ -75,6 +100,15 @@ def draw():
     for game_object in game_world.all_objects():
         game_object.draw()
     update_canvas()
+
+def collide(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+    if left_a > right_b: return False
+    if right_a < left_b: return False
+    if top_a < bottom_b: return False
+    if bottom_a > top_b: return False
+    return True
 
 def read_file():
     obj_xPos, obj_yPos = 0, 0
@@ -95,12 +129,17 @@ def read_file():
             obj_xPos = float(data_map_obj[1])
             obj_yPos = float(data_map_obj[2])
 
+            global blocks
+            blocks = Block(obj_type, obj_xPos, obj_yPos)
+            server.blocks.append(Block(obj_type, obj_xPos, obj_yPos))
 
-            global block
-            block = Block(obj_type, obj_xPos, obj_yPos)
-            game_world.add_object(block, 1)
         except:
             break
 
     obj_data_file.close()
+
+
+
+
+
 

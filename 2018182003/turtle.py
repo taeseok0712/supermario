@@ -32,8 +32,8 @@ class Turtle:
         self.size_y = 48
         self.shooton = False
         self.dir = -1
-        self.maxX = self.x + 100
-        self.minX = self.x - 100
+        self.maxX = self.x + 75
+        self.minX = self.x - 75
         self.vel = RUN_SPEED_PPS
         self.frame = 0
         self.ishitted = False

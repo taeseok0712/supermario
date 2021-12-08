@@ -12,7 +12,7 @@ IDLE, HITTING, BROKING, BROKEN, HIT = range(5)
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 
-
+GROUND, UNDERGROUND, CASTLE = range(3)
 
 TIME_PER_ACTION = 0.3
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
@@ -44,6 +44,7 @@ class Block:
         self.Flame_Change_Start = time.time();
         self.Flame_Change_End = time.time();
         self.move_on = False
+        self.stage = CASTLE
 
         self.add = False
         if self.type == 'random':
@@ -58,12 +59,20 @@ class Block:
             self.type_a = 4
         if self.type == 'pipe_RU':
             self.type_a = 5
+        if self.type == 'ground':
+            self.type_a = 6
+        if self.type == 'hard_brick':
+            self.type_a = 7
 
         if Block.image == None:
             Block.image =load_image("Blocks.png")
 
     def draw(self):
-        self.image.clip_draw(32*self.frame,32 * self.type_a ,32,32,self.x-server.mario.scrollX,self.y)
+        if self.type != 'random':
+            self.image.clip_draw(32*self.frame + 32*self.stage,32 * self.type_a ,32,32,self.x-server.mario.scrollX,self.y)
+        else:
+            self.image.clip_draw(32 * self.frame, 32 * self.type_a, 32, 32,
+                                 self.x - server.mario.scrollX, self.y)
 
 
     def get_bb(self):
@@ -88,6 +97,7 @@ class Block:
                 coin = Coin(self.x, self.y + self.size_y)
 
                 server.coin.append(Coin(self.x, self.y + self.size_y))
+
                 server.ui.coin += 1
             self.add = True
             self.move_on = True

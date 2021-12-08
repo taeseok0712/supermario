@@ -7,9 +7,9 @@ import game_framework
 import game_world
 import server
 from mario import Mario
-from stage1BG import Stage1BG
+from stage2BG import Stage2BG
 from block import Block
-name = "MainState"
+name = "Stage2"
 from ui import C_UI_
 from Gumba import Gumba
 from turtle import Turtle
@@ -23,31 +23,25 @@ backGround = None
 
 
 def enter():
-    server.stage = 1
+    server.stage = 2
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
 
     global backGround
-    backGround = Stage1BG()
+    backGround = Stage2BG()
     game_world.add_object(backGround, 0)
 
-    server.ui = C_UI_()
-    game_world.add_object(server.ui,0)
     read_file()
     game_world.add_objects(server.blocks, 1)
+    for i in server.blocks:
+        i.stage = 1
 
 
-    server.gumba.append(Gumba(750,64))
-    server.gumba.append(Gumba(650, 64))
-    server.gumba.append(Gumba(2700, 64))
-    server.gumba.append(Gumba(2780, 416))
-    server.gumba.append(Gumba(3981, 64))
-    server.gumba.append(Gumba(4020, 64))
-    server.gumba.append(Gumba(4060, 64))
+    server.ui = C_UI_()
+    game_world.add_object(server.ui,1)
     game_world.add_objects(server.gumba,1)
 
-    server.turtle.append(Turtle(1695,64))
-    server.turtle.append(Turtle(3246, 64))
+
     game_world.add_objects(server.turtle, 1)
 
 
@@ -91,9 +85,7 @@ def update():
             server.coin.remove(coin)
             print(server.coin)
             game_world.remove_object(coin)
-    if server.mario.scrollX + server.mario.x > 6550:
-        game_framework.change_state(stage2)
-    if server.ui.time < 0 or server.mario.gameEnd:
+    if server.mario.scrollX + server.mario.x > 6550 or server.ui.time < 0 or server.mario.gameEnd:
         game_framework.change_state(title_state)
 
 
@@ -123,7 +115,7 @@ def read_file():
     obj_name = ""
     data_map_obj = []
 
-    obj_data_file = open('stage1.txt', "r", encoding="utf8")
+    obj_data_file = open('stage2.txt', "r", encoding="utf8")
 
     while True:
         try:

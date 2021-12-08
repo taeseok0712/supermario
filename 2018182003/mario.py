@@ -387,8 +387,8 @@ class Mario:
             self.x -= 3
         if self.collcnt > 2 and self.dir == -1:
             self.x += 3
-        self.x = clamp(25,self.x,550)
-        if self.x == 550:
+        self.x = clamp(25,self.x,650)
+        if self.x == 650:
             if (self.scrollX + self.velocity * game_framework.frame_time + self.accel < 5950):
                 self.scrollX += self.velocity * game_framework.frame_time + self.accel
         if self.x == 25:
@@ -477,8 +477,8 @@ class Mario:
         self.cur_state.draw(self)
 
         #fill here
-        debug_print(' scrollX' + str(self.velocity) )
-        draw_rectangle(*self.get_bb())
+        debug_print('x: ' + str(self.x+self.scrollX)+ 'y: ' + str(self.y) )
+
 
 
     def handle_event(self, event):
