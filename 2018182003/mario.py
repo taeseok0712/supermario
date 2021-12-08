@@ -118,26 +118,30 @@ class RunState:
 class ChangeState:
 
     def enter(mario, event):
-        if not mario.change:
-            if mario.change == False and mario.dmg == False and mario.mario == MARIO:
-                mario.image = load_image('Mario_grow.png')
-                mario.time = 100
-                mario.sizeY = 64
-                mario.y +=16
-                mario.change = True
-            if mario.change == False and mario.dmg == True and mario.mario == SUPER:
-                mario.image = load_image('Mario_grow.png')
-                mario.time = 100
-                mario.change = True
-            if mario.change == False and mario.dmg == False and mario.mario == SUPER:
-                mario.image = load_image('Fire_grow.png')
-                mario.time = 100
-                mario.sizeY = 64
-                mario.change = True
-            if mario.change == False and mario.dmg == True and mario.mario == FIREMARIO:
-                mario.image = load_image('Fire_grow.png')
-                mario.time = 100
-                mario.change = True
+
+
+        if mario.change == False and mario.dmg == True and mario.mario == SUPER:
+            mario.image = load_image('Mario_grow.png')
+            mario.time = 100
+            mario.change = True
+
+        if mario.change == False and mario.dmg == False and mario.mario == SUPER:
+            mario.image = load_image('Fire_grow.png')
+            mario.time = 100
+            mario.sizeY = 64
+            mario.change = True
+        if mario.change == False and mario.dmg == False and mario.mario == MARIO:
+            mario.image = load_image('Mario_grow.png')
+            mario.time = 100
+            mario.sizeY = 64
+            mario.y +=16
+            mario.change = True
+
+
+        if mario.change == False and mario.dmg == True and mario.mario == FIREMARIO:
+            mario.image = load_image('Fire_grow.png')
+            mario.time = 100
+            mario.change = True
 
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
@@ -517,8 +521,7 @@ class Mario:
     def draw(self):
         self.cur_state.draw(self)
 
-        #fill here
-        debug_print('x: ' + str(self.x + self.scrollX)+ 'y: ' + str(self.y) )
+
 
 
 

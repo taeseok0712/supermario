@@ -49,7 +49,6 @@ class Turtle:
             if self.dir == -1:
                 self.image.clip_draw(16*int(self.frame), 24, 16, 24, self.x - server.mario.scrollX, self.y, self.size_x, self.size_y)
 
-            draw_rectangle(*self.get_bb())
 
     def get_bb(self):
             return self.x-server.mario.scrollX - (self.size_x/2),self.y - (self.size_y/2), self.x-server.mario.scrollX + (self.size_x/2),self.y + (self.size_y/2)

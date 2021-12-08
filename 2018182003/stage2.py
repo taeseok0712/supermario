@@ -21,10 +21,15 @@ mario = None
 backGround = None
 
 flag = False
-
+BGM = None
 
 
 def enter():
+    global BGM
+    BGM = load_music('12. Super Mario Bros. Track 12.mp3')
+    BGM.set_volume(64)
+    BGM.repeat_play()
+
     server.stage = 2
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
@@ -62,6 +67,8 @@ def enter():
 
 def exit():
     global flag
+    global BGM
+    BGM = None
     server.state = server.mario.mario
     game_world.clear()
     server.clear()
@@ -104,7 +111,7 @@ def update():
             game_world.remove_object(coin)
 
     if server.mario != None:
-        if (server.ui.time < 0 or server.mario.gameEnd) :
+        if (server.ui.time < 0 or server.mario.gameEnd or server.mario.dead) :
             game_framework.change_state(load_state)
     if server.mario != None:
         if server.mario.scrollX + server.mario.x > 6106 and server.mario != None:

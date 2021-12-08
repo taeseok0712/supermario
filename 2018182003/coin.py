@@ -29,7 +29,6 @@ class Coin:
     def draw(self):
 
             self.coin_image.clip_draw(8 * int(self.frame), 0, 8, 8, self.x - server.mario.scrollX, self.y, self.size_x,self.size_y)
-            draw_rectangle(*self.get_hitbox())
 
     def get_hitbox(self):
             return self.x-server.mario.scrollX - (self.size_x/2),self.y - (self.size_y/2), self.x-server.mario.scrollX + (self.size_x/2),self.y + (self.size_y/2)

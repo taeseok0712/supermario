@@ -56,7 +56,7 @@ class Cupa:
     def draw(self):
 
         self.image.clip_draw(32 * int(self.frame), 0, 32, 32, self.x - server.mario.scrollX, self.y, self.size_x, self.size_y)
-        draw_rectangle(*self.get_bb())
+
 
     def get_bb(self):
             return self.x-server.mario.scrollX - (self.size_x/2),self.y - (self.size_y/2), self.x-server.mario.scrollX + (self.size_x/2),self.y + (self.size_y/2)
@@ -150,7 +150,7 @@ class Cupa_fire:
 
     def draw(self):
         self.image.clip_draw(48*int(self.frame), 0, 48, 16, self.x-server.mario.scrollX, self.y, 48, 16)
-        draw_rectangle(*self.get_bb())
+
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION_FIRE * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION_FIRE
@@ -200,7 +200,6 @@ class Cupa_hammer:
     def draw(self):
         self.image.clip_draw(16*int(self.frame), 0, 16, 16, self.x-server.mario.scrollX, self.y, self.sizeX, self.sizeY)
 
-        draw_rectangle(*self.get_bb())
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION_HAMMER * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION_HAMMER

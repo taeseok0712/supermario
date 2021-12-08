@@ -40,7 +40,7 @@ class Gumba:
     def draw(self):
             self.image.clip_draw(16*int(self.frame), 0, 16, 16, self.x - server.mario.scrollX, self.y, 32, 32)
 
-            draw_rectangle(*self.get_bb())
+
 
     def get_bb(self):
             return self.x-server.mario.scrollX - (self.size_x/2),self.y - (self.size_y/2), self.x-server.mario.scrollX + (self.size_x/2),self.y + (self.size_y/2)
@@ -52,7 +52,7 @@ class Gumba:
                 self.Flame_Change_Start = time.time();
 
             self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
-            if self.x - server.mario.scrollX < 800:
+            if server.mario != None:
                 self.move()
 
         if self.ishitted:

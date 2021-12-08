@@ -7,6 +7,7 @@ class Stage1BG:
         self.scroll_x = 0
 
 
+
     def update(self):
         pass
 

@@ -23,7 +23,15 @@ flag = False
 
 
 
+BGM = None
+
+
+
 def enter():
+    global BGM
+    BGM = load_music('Super Mario Bross - Theme Song.mp3')
+    BGM.set_volume(64)
+    BGM.repeat_play()
     server.stage = 1
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
@@ -57,6 +65,8 @@ def enter():
 
 
 def exit():
+    global BGM
+    BGM = None
     server.state =server.mario.mario
     game_world.clear()
     server.clear()
@@ -89,6 +99,7 @@ def handle_events():
 
 def update():
     global flag
+
     for game_object in game_world.all_objects():
         game_object.update()
     for coin in server.coin:

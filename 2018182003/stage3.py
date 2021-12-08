@@ -24,14 +24,18 @@ backGround = None
 flag = False
 bossflag = False
 Ending = False
-
+BGM = None
 timer = 50
 def enter():
 
     global bossflag
     global Ending
     global timer
-    server.life= 3
+    global BGM
+    BGM = load_music('30 - Castle of Koopa.mp3')
+    BGM.set_volume(64)
+    BGM.repeat_play()
+
     server.stage = 3
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
@@ -70,6 +74,8 @@ def enter():
 
 
 def exit():
+    global BGM
+    BGM = None
     server.state = server.mario.mario
     game_world.clear()
     server.clear()
