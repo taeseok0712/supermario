@@ -14,58 +14,71 @@ from ui import C_UI_
 from Gumba import Gumba
 from turtle import Turtle
 import title_state
+from cupa import Cupa
+from Stone import Stone
 import stage2
 import load_state
-
 mario = None
 backGround = None
 
 flag = False
+bossflag = False
+Ending = False
 
-
-
+timer = 50
 def enter():
-    server.stage = 2
+
+    global bossflag
+    global Ending
+    global timer
+    server.life= 3
+    server.stage = 3
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
-    server.mario.mario =server.state
-
+    server.mario.mario = server.state
     global backGround
     backGround = Stage2BG()
     game_world.add_object(backGround, 0)
 
 
+    server.stone.append(Stone(1162, 493))
+    server.stone.append(Stone(400, 493))
+    server.stone.append(Stone(500, 493))
+    server.stone.append(Stone(600, 493))
+    server.stone.append(Stone(3016, 237))
+    server.stone.append(Stone(3195, 237))
+    server.stone.append(Stone(3439, 237))
+    game_world.add_objects(server.stone, 1)
+
+    server.turtle.append(Turtle(4084, 64))
+    server.gumba.append(Gumba(2031, 64))
+    game_world.add_objects(server.turtle, 1)
+    game_world.add_objects(server.gumba, 1)
+    server.cupa.append(Cupa(5457, 160))
+    game_world.add_objects(server.cupa, 1)
     read_file()
     game_world.add_objects(server.blocks, 1)
     for i in server.blocks:
-        i.stage = 1
+        i.stage = 2
     server.ui = C_UI_()
     game_world.add_object(server.ui, 1)
 
 
-    server.gumba.append(Gumba(1650, 64))
-    server.gumba.append(Gumba(2453, 64))
-    server.gumba.append(Gumba(2490, 64))
-    server.gumba.append(Gumba(3163, 320))
-    server.gumba.append(Gumba(5291, 192))
-    server.gumba.append(Gumba(6106, 64))
-    game_world.add_objects(server.gumba, 1)
-
-    server.turtle.append(Turtle(300, 64))
-    server.turtle.append(Turtle(3180, 64))
-    server.turtle.append(Turtle(5245, 64))
-    game_world.add_objects(server.turtle, 1)
 
 
 
 
 
 def exit():
-    global flag
     server.state = server.mario.mario
     game_world.clear()
     server.clear()
+    global flag
+    global bossflag
+    global timer
     flag = False
+    bossflag = False
+    timer = 50
 
 
 def pause():
@@ -88,13 +101,16 @@ def handle_events():
             game_framework.change_state(stage2)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
 
-            game_framework.change_state(load_state)
+            print(server.mario.scrollX ," ",server.mario.x)
         else:
             server.mario.handle_event(event)
 
 
 def update():
     global flag
+    global bossflag
+    global timer
+
     for game_object in game_world.all_objects():
         game_object.update()
     for coin in server.coin:
@@ -107,10 +123,31 @@ def update():
         if (server.ui.time < 0 or server.mario.gameEnd) :
             game_framework.change_state(load_state)
     if server.mario != None:
-        if server.mario.scrollX + server.mario.x > 6106 and server.mario != None:
-            flag = True
-            server.stage = 3
+        if server.mario.scrollX + server.mario.x > 6550 and server.mario != None:
+
             game_framework.change_state(load_state)
+            server.stage = 3
+    if server.mario != None:
+        if server.mario.scrollX + server.mario.x > 4870 and not bossflag:
+            server.mario.scrollX = 4800
+            server.mario.x = 50
+            bossflag = True
+    for block in server.blocks:
+        if block.type == 'pipe_RU':
+            if collide(block,server.mario):
+                flag = True
+    if flag:
+        timer -= 1
+        for block in server.blocks:
+            if block.type == 'hard_brick':
+                game_world.remove_object(block)
+                server.blocks.remove(block)
+
+    if flag and timer < 0:
+        server.Game_End = True
+        game_framework.change_state(load_state)
+    print(timer)
+
 
 
 
@@ -140,7 +177,7 @@ def read_file():
     obj_name = ""
     data_map_obj = []
 
-    obj_data_file = open('stage2.txt', "r", encoding="utf8")
+    obj_data_file = open('stage3.txt', "r", encoding="utf8")
 
     while True:
         try:
@@ -161,7 +198,6 @@ def read_file():
             break
 
     obj_data_file.close()
-
 
 
 

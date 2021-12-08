@@ -1,5 +1,7 @@
 import game_framework
 import main_state
+import stage2
+import stage3
 from pico2d import *
 import server
 
@@ -12,7 +14,9 @@ image = None
 
 def enter():
     global image
+    server.score = 0
     server.life = 3
+    server.Game_End = False
     image = load_image('title.png')
 
 

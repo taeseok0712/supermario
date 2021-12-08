@@ -10,9 +10,7 @@ import server
 from stage1BG import Stage1BG
 from stage2BG import Stage2BG
 from mario import Mario
-class Point(ctypes.Structure):
-    _fields_ = [("x", ctypes.c_int),
-                ("y", ctypes.c_int)]
+
 CANVAS_HEIGHT =600
 
 

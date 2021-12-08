@@ -118,32 +118,26 @@ class RunState:
 class ChangeState:
 
     def enter(mario, event):
-        if mario.change == False and mario.dmg == False and mario.mario == MARIO:
-            mario.image = load_image('Mario_grow.png')
-            mario.time = 100
-            mario.sizeY = 64
-            mario.y +=16
-            mario.change = True
-
-        if mario.change == False and mario.dmg == True and mario.mario == SUPER:
-
-            mario.image = load_image('Mario_grow.png')
-            mario.time = 100
-
-            mario.change = True
-
-        if mario.change == False and mario.dmg == False and mario.mario == SUPER:
-            mario.image = load_image('Fire_grow.png')
-            mario.time = 100
-            mario.sizeY = 64
-            mario.change = True
-
-        if mario.change == False and mario.dmg == True and mario.mario == FIREMARIO:
-
-            mario.image = load_image('Fire_grow.png')
-            mario.time = 100
-
-            mario.change = True
+        if not mario.change:
+            if mario.change == False and mario.dmg == False and mario.mario == MARIO:
+                mario.image = load_image('Mario_grow.png')
+                mario.time = 100
+                mario.sizeY = 64
+                mario.y +=16
+                mario.change = True
+            if mario.change == False and mario.dmg == True and mario.mario == SUPER:
+                mario.image = load_image('Mario_grow.png')
+                mario.time = 100
+                mario.change = True
+            if mario.change == False and mario.dmg == False and mario.mario == SUPER:
+                mario.image = load_image('Fire_grow.png')
+                mario.time = 100
+                mario.sizeY = 64
+                mario.change = True
+            if mario.change == False and mario.dmg == True and mario.mario == FIREMARIO:
+                mario.image = load_image('Fire_grow.png')
+                mario.time = 100
+                mario.change = True
 
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
@@ -167,31 +161,32 @@ class ChangeState:
     def do(mario):
         mario.move()
         mario.time -= 1
-        if mario.time == 0 and mario.dmg == False and mario.mario == MARIO:
-            mario.add_event(GROW_TIMER)
-            mario.image = load_image('Super_mario.png')
-            mario.mario = SUPER
-            mario.change = False
-        elif mario.time == 0 and mario.dmg == True and mario.mario == SUPER:
-            mario.add_event(GROW_TIMER)
-            mario.image = load_image('player_Mario.png')
-            mario.dmg = False
-            mario.sizeY = 32
-            mario.y -= 16
-            mario.mario = MARIO
-            mario.change = False
+        if mario.change:
+            if mario.time == 0 and mario.dmg == False and mario.mario == MARIO:
+                mario.add_event(GROW_TIMER)
+                mario.image = load_image('Super_mario.png')
+                mario.mario = SUPER
+                mario.change = False
+            elif mario.time == 0 and mario.dmg == True and mario.mario == SUPER:
+                mario.add_event(GROW_TIMER)
+                mario.image = load_image('player_Mario.png')
+                mario.dmg = False
+                mario.sizeY = 32
+                mario.y -= 16
+                mario.mario = MARIO
+                mario.change = False
 
-        elif mario.time == 0 and mario.dmg == False and mario.mario == SUPER:
-            mario.add_event(GROW_TIMER)
-            mario.image = load_image('Fire_mario.png')
-            mario.mario = FIREMARIO
-            mario.change = False
-        elif mario.time == 0 and mario.dmg == True and mario.mario == FIREMARIO:
-            mario.add_event(GROW_TIMER)
-            mario.image = load_image('Super_Mario.png')
-            mario.dmg = False
-            mario.mario = SUPER
-            mario.change = False
+            elif mario.time == 0 and mario.dmg == False and mario.mario == SUPER:
+                mario.add_event(GROW_TIMER)
+                mario.image = load_image('Fire_mario.png')
+                mario.mario = FIREMARIO
+                mario.change = False
+            elif mario.time == 0 and mario.dmg == True and mario.mario == FIREMARIO:
+                mario.add_event(GROW_TIMER)
+                mario.image = load_image('Super_Mario.png')
+                mario.dmg = False
+                mario.mario = SUPER
+                mario.change = False
 
         mario.frame = (mario.frame + mario.FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
 
@@ -366,7 +361,7 @@ class Mario:
         self.x, self.y = 100, 64
         self.state = Idle
         self.distance = 32
-        self.mario = MARIO #마리오의 상태 (작은,슈퍼,파이어)
+        self.mario = server.state #마리오의 상태 (작은,슈퍼,파이어)
         if self.mario== MARIO:
             self.image = load_image('player_Mario.png')
             self.sizeY = 32
@@ -427,8 +422,8 @@ class Mario:
             self.x -= 3
         if self.collcnt > 2 and self.dir == -1:
             self.x += 3
-        self.x = clamp(25,self.x,650)
-        if self.x == 650:
+        self.x = clamp(25,self.x,550)
+        if self.x == 550:
             if (self.scrollX + self.velocity * game_framework.frame_time + self.accel < 5950):
                 self.scrollX += self.velocity * game_framework.frame_time + self.accel
         if self.x == 25:
@@ -439,7 +434,6 @@ class Mario:
         self.event_que.insert(0, event)
 
     def update(self):
-        print(server.life)
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()
@@ -524,7 +518,7 @@ class Mario:
         self.cur_state.draw(self)
 
         #fill here
-        debug_print('x: ' + str(self.mario)+ 'y: ' + str(self.event_que) )
+        debug_print('x: ' + str(self.x + self.scrollX)+ 'y: ' + str(self.y) )
 
 
 
@@ -532,6 +526,8 @@ class Mario:
         if (event.type, event.key) in key_event_table and not self.dead:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
+        if event.type == SDL_KEYDOWN and event.key == SDLK_F5:
+            print(self.x +self.scrollX , self.y)
 
     def setX(self):
         self.y -= 5

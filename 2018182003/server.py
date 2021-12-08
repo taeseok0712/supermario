@@ -1,4 +1,7 @@
+MARIO,SUPER,FIRE = range(3)
+state = MARIO
 mario = None
+score = 0
 stage = None
 blocks = []
 item = []
@@ -9,7 +12,9 @@ turtle = []
 flower = []
 Flag = False
 life = None
+stone = []
 cupa = []
+Game_End = False
 def clear():
     global mario
     global blocks
@@ -21,10 +26,14 @@ def clear():
     global flower
     global Flag
     global cupa
-    cupa = None
+    global Game_End
+    global stone
+
+    cupa = []
     blocks = []
     item = []
     ui = None
+    stone = []
     coin = []
     gumba = []
     turtle = []

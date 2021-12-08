@@ -27,6 +27,7 @@ def enter():
     server.stage = 1
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
+    server.mario.mario = server.state
 
     global backGround
     backGround = Stage1BG()
@@ -52,12 +53,11 @@ def enter():
     game_world.add_objects(server.turtle, 1)
 
 
-    print(server.mario)
-
 
 
 
 def exit():
+    server.state =server.mario.mario
     game_world.clear()
     server.clear()
 
@@ -101,7 +101,7 @@ def update():
         if (server.ui.time < 0 or server.mario.gameEnd) :
             game_framework.change_state(load_state)
     if server.mario != None:
-        if server.mario.scrollX + server.mario.x > 6550 and server.mario != None:
+        if server.mario.scrollX + server.mario.x > 6450 and server.mario != None:
             flag = True
             game_framework.change_state(load_state)
             server.stage = 2

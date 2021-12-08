@@ -101,7 +101,7 @@ class Block:
                 coin = Coin(self.x, self.y + self.size_y)
 
                 server.coin.append(Coin(self.x, self.y + self.size_y))
-
+                server.score +=1
                 server.ui.coin += 1
             self.add = True
             self.move_on = True

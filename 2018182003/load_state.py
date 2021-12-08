@@ -5,6 +5,7 @@ import server
 from ui import C_UI_
 import game_world
 import stage2
+import stage3
 import title_state
 
 
@@ -22,6 +23,8 @@ def enter():
     if server.life > 0:
         image = load_image('load.png')
     else: image = load_image('gameover.png')
+    if server.Game_End:
+        image = load_image('ending.png')
     font = load_font('ENCR10B.TTF', 32)
     server.ui = C_UI_()
     timer = 500
@@ -56,6 +59,8 @@ def draw():
         font.draw(425, 310, str(server.life), (255, 255, 255))
     else:
         image.draw(400, 300, 800, 600)
+    if server.Game_End:
+        image.draw(400, 300, 800, 600)
     update_canvas()
 
 
@@ -65,17 +70,23 @@ def draw():
 
 
 def update():
-    global  timer
+    global timer
     timer -= 1
-    if timer < 0 and server.life > 0:
+    if timer < 0 and server.life > 0 and not server.Game_End:
         if server.stage == 1:
             game_framework.change_state(main_state)
         elif server.stage == 2:
             game_framework.change_state(stage2)
         elif server.stage == 3:
-            game_framework.change_state(main_state)
+            game_framework.change_state(stage3)
     if timer < 0 and server.life <= 0:
         game_framework.change_state(title_state)
+    if timer < 0 and server.Game_End:
+        server.Game_End = False
+        game_framework.change_state(title_state)
+
+
+
 
 
 

@@ -13,6 +13,7 @@ name = "MainState"
 from ui import C_UI_
 from Gumba import Gumba
 from turtle import Turtle
+from Stone import Stone
 import title_state
 from cupa import Cupa
 mario = None
@@ -40,8 +41,8 @@ def enter():
 
 
 
-    server.cupa.append(Cupa(650, 64))
-    game_world.add_objects(server.cupa, 1)
+    server.stone.append(Stone(550, 200))
+    game_world.add_objects(server.stone, 1)
 
 
 

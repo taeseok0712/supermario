@@ -14,8 +14,8 @@ FRAMES_PER_ACTION = 4
 FRAMES_PER_ACTION_FIRE = 2
 FRAMES_PER_ACTION_HAMMER = 4
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
-HAMMERTIMER = 300
-FIRETIMER = 500
+HAMMERTIMER = 150
+FIRETIMER = 200
 
 TIME_PER_ACTION = 0.3
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
@@ -31,7 +31,7 @@ class Cupa:
     def __init__(self,cx,cy):
         self.x = cx
         self.y = cy + BLOCK_SIZE/2
-        self.collcnt = 2
+        self.collcnt = 0
         self.canKick = False
         self.size_x = 64
         self.size_y = 64
@@ -48,6 +48,7 @@ class Cupa:
         self.hammertimer = HAMMERTIMER
         self.hammertime = 0
         self.hammercnt = 0
+        self.falltime = 0
         self.Flame_Change_Start = time.time()
         self.Flame_Change_End = time.time()
         self.image = load_image("Cupa.png")
@@ -62,31 +63,41 @@ class Cupa:
 
     def update(self):
         self.Flame_Change_End = time.time()
-        self.firetimer -= 1
-        self.hammertimer -= 1
-        self.move()
-        self.fire()
-        self.hammer()
+        if self.x - server.mario.scrollX < 800:
+            self.firetimer -= 1
+            self.hammertimer -= 1
+            self.move()
+            self.fire()
+            self.hammer()
         if self.ishitted== False:
             self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
         if collide(self, server.mario):
             server.mario.dmg = True
             if server.mario.mario != 0:
                 server.mario.add_event(CHANGE)
+        if self.y < 0:
+
+            game_world.remove_object(self)
+            server.cupa.remove(self)
 
 
     def move(self):
         self.gravity()
-        if not self.ishitted:
 
+        if not self.ishitted:
             self.x += self.vel * game_framework.frame_time * self.dir
 
             if self.x > self.maxX or self.x < self.minX:
                 self.dir = self.dir * -1
+        if not self.isColl:
+            self.falltime += game_framework.frame_time
+
+            self.y += FAllING_POWER *GRAVITY * self.falltime * 0.5 * game_framework.frame_time
+
 
     def fire(self):
         if self.firetimer < 0 :
-            fire_Cupa = Cupa_fire(self.x, self.y, -1)
+            fire_Cupa = Cupa_fire(self.x, self.y- 10, -1)
             game_world.add_object(fire_Cupa, 1)
             self.firetimer = FIRETIMER
 
@@ -144,7 +155,7 @@ class Cupa_fire:
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION_FIRE * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION_FIRE
         self.x += RUN_SPEED_PPS * game_framework.frame_time * self.dir * 4
-        if self.x < 25 or self.x > 800 - 25:
+        if self.x -server.mario.scrollX < 25:
             game_world.remove_object(self)
         if collide(self, server.mario):
             game_world.remove_object(self)
@@ -195,7 +206,7 @@ class Cupa_hammer:
         self.frame = (self.frame + FRAMES_PER_ACTION_HAMMER * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION_HAMMER
         self.x += RUN_SPEED_PPS * game_framework.frame_time * self.dir * 4
         self.move()
-        if self.x < 25 or self.x > 800 - 25:
+        if self.x-server.mario.scrollX < 25:
             game_world.remove_object(self)
         if collide(self, server.mario):
             game_world.remove_object(self)
