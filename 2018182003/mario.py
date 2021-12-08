@@ -127,11 +127,13 @@ class ChangeState:
 
         if mario.change == False and mario.dmg == False and mario.mario == SUPER:
             mario.image = load_image('Fire_grow.png')
+            mario.power_sound.play()
             mario.time = 100
             mario.sizeY = 64
             mario.change = True
         if mario.change == False and mario.dmg == False and mario.mario == MARIO:
             mario.image = load_image('Mario_grow.png')
+            mario.power_sound.play()
             mario.time = 100
             mario.sizeY = 64
             mario.y +=16
@@ -221,6 +223,7 @@ class JumpState():
             mario.privY = mario.y
             mario.jumpOn = True
             mario.jumpTime = 0
+            mario.jump_Sound.play()
 
         if event == SHIFT_DOWN:
             mario.jumpCharge = True
@@ -326,12 +329,15 @@ class DeadState():
 
     def enter(mario, event):
         mario.vel = 0
+
         mario.frame = 10
 
     def exit(mario, event):
+        mario.dead_sound.play()
         pass
 
     def do(mario):
+        mario.soundTimer -=1
         if mario.y - mario.hitY < 32 and not mario.fallOn:
             mario.y += 1
             if mario.y - mario.hitY == 32:
@@ -407,6 +413,15 @@ class Mario:
         self.catchY = self.y
         self.hitY = self.y
         self.fire_list = []
+        self.soundTimer = 235
+        self.jump_Sound = load_wav('smb_jump-small.wav')
+        self.jump_Sound.set_volume(32)
+        self.power_sound = load_wav('smb_powerup.wav')
+        self.power_sound.set_volume(32)
+        self.stomp_sound = load_wav('smb_stomp.wav')
+        self.stomp_sound.set_volume(32)
+        self.dead_sound = load_wav('smb_mariodie.wav')
+        self.dead_sound.set_volume(16)
     def get_bb(self):
         return self.x - (self.sizeX/2) + 5,self.y - (self.sizeY/2), self.x - 5+ (self.sizeX/2),self.y + (self.sizeY/2)
 
@@ -474,6 +489,7 @@ class Mario:
                     gumba.ishitted = True
                     self.catchY = self.y
                     self.catchMonster = True
+                    self.stomp_sound.play()
                 else:
                     if not gumba.ishitted:
                         if self.mario != MARIO:
@@ -493,9 +509,11 @@ class Mario:
                     turtle.ishitted = True
                     self.catchY = self.y
                     self.catchMonster = True
+                    self.stomp_sound.play()
                 if turtle.canKick and turtle.ishitted and not turtle.shooton:
                     turtle.dir = self.dir
                     turtle.shooton = True
+                    self.stomp_sound.play()
                 else:
                     if not turtle.ishitted and not turtle.canKick:
                         if self.mario != MARIO:
@@ -514,7 +532,7 @@ class Mario:
             self.add_event(DEAD)
 
 
-        if self.y < 0:
+        if self.y < 0 and self.soundTimer < 0:
             server.life -=1
             self.gameEnd = True
 

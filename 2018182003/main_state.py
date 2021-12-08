@@ -29,7 +29,7 @@ BGM = None
 
 def enter():
     global BGM
-    BGM = load_music('Super Mario Bross - Theme Song.mp3')
+    BGM = load_music('stage1.mp3')
     BGM.set_volume(64)
     BGM.repeat_play()
     server.stage = 1

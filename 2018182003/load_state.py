@@ -13,6 +13,7 @@ font = None
 name = "Load"
 image = None
 
+bgm = None
 
 timer = None
 
@@ -20,6 +21,7 @@ def enter():
     global image
     global timer
     global font
+    global bgm
     if server.life > 0:
         image = load_image('load.png')
     else: image = load_image('gameover.png')
@@ -27,7 +29,11 @@ def enter():
         image = load_image('ending.png')
     font = load_font('ENCR10B.TTF', 32)
     server.ui = C_UI_()
-    timer = 500
+    timer = 1500
+    if server.life <= 0:
+        bgm = load_wav('smb_gameover.wav')
+        bgm.set_volume(32)
+        bgm.play()
 
     game_world.add_object(server.ui,0)
 

@@ -46,6 +46,8 @@ class Block:
         self.Flame_Change_End = time.time();
         self.move_on = False
         self.stage = GROUND
+        self.coin_sound = load_wav('smb_coin.wav')
+        self.coin_sound.set_volume(32)
 
         self.add = False
         if self.type == 'random':
@@ -103,6 +105,7 @@ class Block:
                 server.coin.append(Coin(self.x, self.y + self.size_y))
                 server.score +=1
                 server.ui.coin += 1
+                self.coin_sound.play()
             self.add = True
             self.move_on = True
 
