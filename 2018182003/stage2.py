@@ -24,8 +24,9 @@ backGround = None
 
 def enter():
     server.stage = 2
-    server.mario = Mario()
-    game_world.add_object(server.mario, 1)
+    if server.mario == None:
+        server.mario = Mario()
+        game_world.add_object(server.mario, 1)
 
     global backGround
     backGround = Stage2BG()
@@ -44,7 +45,7 @@ def enter():
 
     game_world.add_objects(server.turtle, 1)
 
-
+    print(server.mario)
 
 
 
@@ -53,8 +54,6 @@ def enter():
 def exit():
     game_world.clear()
     server.clear()
-    for game_object in game_world.all_objects():
-        print(game_object)
 def pause():
     pass
 

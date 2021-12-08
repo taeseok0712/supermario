@@ -6,10 +6,11 @@ import server
 import time
 import game_world
 from mushroom import MushRoom
+from flower import Flower
 from coin import Coin
 
 IDLE, HITTING, BROKING, BROKEN, HIT = range(5)
-
+MARIO,SUPER,FIRE = range(3)
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 
 GROUND, UNDERGROUND, CASTLE = range(3)
@@ -44,7 +45,7 @@ class Block:
         self.Flame_Change_Start = time.time();
         self.Flame_Change_End = time.time();
         self.move_on = False
-        self.stage = CASTLE
+        self.stage = GROUND
 
         self.add = False
         if self.type == 'random':
@@ -92,7 +93,10 @@ class Block:
             self.frame = 3
             self.state = HITTING
             if self.item == 1:
-                server.item.append(MushRoom(self.x, self.y + self.size_y))
+                if server.mario.mario == MARIO:
+                    server.item.append(MushRoom(self.x, self.y + self.size_y))
+                else:
+                    server.flower.append(Flower(self.x,self.y + self.size_y))
             else:
                 coin = Coin(self.x, self.y + self.size_y)
 
@@ -117,7 +121,10 @@ class Block:
             self.state = BROKEN
             if self.add == True:
                 if self.item == 1:
-                    game_world.add_objects(server.item,0)
+                    if server.mario.mario == MARIO:
+                        game_world.add_objects(server.item,0)
+                    else:
+                        game_world.add_objects(server.flower,0)
                 else:
                     game_world.add_objects(server.coin,0)
 

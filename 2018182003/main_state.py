@@ -15,10 +15,11 @@ from Gumba import Gumba
 from turtle import Turtle
 import title_state
 import stage2
+import load_state
 mario = None
 backGround = None
 
-
+flag = False
 
 
 
@@ -51,7 +52,7 @@ def enter():
     game_world.add_objects(server.turtle, 1)
 
 
-
+    print(server.mario)
 
 
 
@@ -59,8 +60,8 @@ def enter():
 def exit():
     game_world.clear()
     server.clear()
-    for game_object in game_world.all_objects():
-        print(game_object)
+
+
 def pause():
     pass
 
@@ -76,14 +77,18 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_UP and flag:
+
+            game_framework.change_state(stage2)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
-            for block in server.blocks:
-                block.y += 16
+
+            game_framework.change_state(load_state)
         else:
             server.mario.handle_event(event)
 
 
 def update():
+    global flag
     for game_object in game_world.all_objects():
         game_object.update()
     for coin in server.coin:
@@ -91,9 +96,16 @@ def update():
             server.coin.remove(coin)
             print(server.coin)
             game_world.remove_object(coin)
-    if server.mario.scrollX + server.mario.x > 6550:
-        game_framework.change_state(stage2)
-    if server.ui.time < 0 or server.mario.gameEnd:
+
+    if server.mario != None:
+        if (server.ui.time < 0 or server.mario.gameEnd) and server.life > 0:
+            game_framework.change_state(load_state)
+    if server.mario != None:
+        if server.mario.scrollX + server.mario.x > 6550 and server.mario != None:
+            flag = True
+            game_framework.change_state(load_state)
+            server.stage = 2
+    if server.life < 0:
         game_framework.change_state(title_state)
 
 

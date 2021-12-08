@@ -11,6 +11,7 @@ class Stage1BG:
         pass
 
     def draw(self):
+
         self.image.clip_draw(0, 0, 3376 * 2, 600, 3376 - server.mario.scrollX, 300)
         # fill here
 

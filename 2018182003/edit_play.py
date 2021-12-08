@@ -7,13 +7,14 @@ import game_framework
 import game_world
 import server
 from mario import Mario
-from stage2BG import Stage2BG
+from stage1BG import Stage1BG
 from block import Block
 name = "MainState"
 from ui import C_UI_
 from Gumba import Gumba
 from turtle import Turtle
 import title_state
+from cupa import Cupa
 mario = None
 backGround = None
 
@@ -22,12 +23,12 @@ backGround = None
 
 
 def enter():
-
+    server.life = 2
     server.mario = Mario()
     game_world.add_object(server.mario, 1)
 
     global backGround
-    backGround = Stage2BG()
+    backGround = Stage1BG()
     game_world.add_object(backGround, 0)
 
     server.ui = C_UI_()
@@ -36,11 +37,12 @@ def enter():
     game_world.add_objects(server.blocks, 1)
 
 
-    server.gumba.append(Gumba(750,64))
-    game_world.add_objects(server.gumba,1)
 
-    server.turtle.append(Turtle(650,64))
-    game_world.add_objects(server.turtle, 1)
+
+
+    server.cupa.append(Cupa(650, 64))
+    game_world.add_objects(server.cupa, 1)
+
 
 
 

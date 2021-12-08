@@ -1,6 +1,7 @@
 import game_framework
 import main_state
 from pico2d import *
+import server
 
 
 
@@ -11,6 +12,7 @@ image = None
 
 def enter():
     global image
+    server.life = 3
     image = load_image('title.png')
 
 

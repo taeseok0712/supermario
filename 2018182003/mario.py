@@ -1,6 +1,7 @@
 import game_framework
 from pico2d import *
 import server
+from fire import Fire
 
 import random
 import game_world
@@ -26,12 +27,12 @@ CHARGE_POWER = 100
 MAX_CHARGE = 50 * PIXEL_PER_METER
 JUMP_POWER = 8 * PIXEL_PER_METER
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP, SHIFT_DOWN, SPACE , COLL_B , COLL_U , FALL, LANDING, LANDING_MOVE, CHANGE, GROW_TIMER, DEAD= range(15)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SHIFT_UP, SHIFT_DOWN, SPACE ,  FALL, LANDING, LANDING_MOVE, CHANGE, GROW_TIMER, DEAD= range(13)
 Idle, Jump , Land , Fall , Run= range(5)
 
-MARIO,SUPER,FIRE = range(3)
+MARIO,SUPER,FIREMARIO = range(3)
 
-eventName = ['RIGHT_DOWN', 'LEFT_DOWN', 'RIGHT_UP', 'LEFT_UP', 'SHIFT_UP','SHIFT_DOWN', 'SPACE' , 'COLL_B' , 'COLL_U' ,'FALL','LANDING','LANDING_MOVE']
+eventName = ['RIGHT_DOWN', 'LEFT_DOWN', 'RIGHT_UP', 'LEFT_UP', 'SHIFT_UP','SHIFT_DOWN', 'SPACE','FALL','LANDING','LANDING_MOVE']
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
     (SDL_KEYDOWN, SDLK_LEFT): LEFT_DOWN,
@@ -43,15 +44,13 @@ key_event_table = {
 }
 
 
-# Boy States
-
 
 
 class IdleState:
 
     def enter(mario, event):
         mario.state = Idle
-        print(mario.collcnt)
+
         mario.gravity()
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
@@ -62,9 +61,9 @@ class IdleState:
         elif event == LEFT_UP:
             mario.velocity += RUN_SPEED_PPS
 
-    def exit(boy, event):
+    def exit(mario, event):
         if event == SPACE:
-            boy.fire_ball()
+            mario.fire_ball()
         pass
 
     def do(mario):
@@ -133,6 +132,19 @@ class ChangeState:
 
             mario.change = True
 
+        if mario.change == False and mario.dmg == False and mario.mario == SUPER:
+            mario.image = load_image('Fire_grow.png')
+            mario.time = 100
+            mario.sizeY = 64
+            mario.change = True
+
+        if mario.change == False and mario.dmg == True and mario.mario == FIREMARIO:
+
+            mario.image = load_image('Fire_grow.png')
+            mario.time = 100
+
+            mario.change = True
+
         if event == RIGHT_DOWN:
             mario.velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
@@ -155,18 +167,30 @@ class ChangeState:
     def do(mario):
         mario.move()
         mario.time -= 1
-        if mario.time == 0 and mario.dmg == False:
+        if mario.time == 0 and mario.dmg == False and mario.mario == MARIO:
             mario.add_event(GROW_TIMER)
             mario.image = load_image('Super_mario.png')
             mario.mario = SUPER
             mario.change = False
-        if mario.time == 0 and mario.dmg == True:
+        elif mario.time == 0 and mario.dmg == True and mario.mario == SUPER:
             mario.add_event(GROW_TIMER)
             mario.image = load_image('player_Mario.png')
             mario.dmg = False
             mario.sizeY = 32
             mario.y -= 16
             mario.mario = MARIO
+            mario.change = False
+
+        elif mario.time == 0 and mario.dmg == False and mario.mario == SUPER:
+            mario.add_event(GROW_TIMER)
+            mario.image = load_image('Fire_mario.png')
+            mario.mario = FIREMARIO
+            mario.change = False
+        elif mario.time == 0 and mario.dmg == True and mario.mario == FIREMARIO:
+            mario.add_event(GROW_TIMER)
+            mario.image = load_image('Super_Mario.png')
+            mario.dmg = False
+            mario.mario = SUPER
             mario.change = False
 
         mario.frame = (mario.frame + mario.FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
@@ -213,6 +237,8 @@ class JumpState():
         if mario.jumpOn == False:
             mario.jumpPower = JUMP_POWER
             mario.jumpTime = 0
+        if event == SPACE:
+            mario.fire_ball()
 
     def do(mario):
         mario.move()
@@ -269,6 +295,8 @@ class FallState():
     def exit(mario, event):
         mario.fallOn = False
         mario.jumpPower = JUMP_POWER
+        if event == SPACE:
+            mario.fire_ball()
 
     def do(mario):
         mario.move()
@@ -325,11 +353,11 @@ class DeadState():
 next_state_table = {
     IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState , SHIFT_DOWN:JumpState, SHIFT_UP:IdleState, FALL:FallState, LANDING:IdleState, CHANGE:ChangeState,DEAD:DeadState},
     RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState, SHIFT_DOWN:JumpState, SHIFT_UP:RunState, LANDING_MOVE:RunState, FALL:FallState, LANDING:IdleState, CHANGE:ChangeState,DEAD:DeadState},
-    JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState, SHIFT_DOWN:JumpState, SHIFT_UP:JumpState , FALL:FallState, CHANGE:ChangeState,DEAD:DeadState},
-    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState , LANDING:IdleState, LANDING_MOVE:RunState, FALL:FallState, CHANGE:ChangeState,DEAD:DeadState},
-    DeadState: {DEAD:DeadState},
+    JumpState:{RIGHT_UP: JumpState, LEFT_UP: JumpState, LEFT_DOWN: JumpState, RIGHT_DOWN: JumpState, SPACE: JumpState, SHIFT_DOWN:JumpState, SHIFT_UP:JumpState , FALL:FallState, CHANGE:ChangeState,DEAD:DeadState},
+    FallState: {RIGHT_UP: FallState, LEFT_UP: FallState, LEFT_DOWN: FallState, RIGHT_DOWN: FallState, SPACE: FallState, SHIFT_DOWN: FallState, SHIFT_UP: FallState , LANDING:IdleState, LANDING_MOVE:RunState, FALL:FallState, CHANGE:ChangeState,DEAD:DeadState},
+    DeadState: {RIGHT_UP: DeadState, LEFT_UP: DeadState, LEFT_DOWN: DeadState, RIGHT_DOWN: DeadState, SPACE: DeadState, SHIFT_DOWN: DeadState, SHIFT_UP: DeadState , LANDING:DeadState, LANDING_MOVE:DeadState, FALL:DeadState, CHANGE:DeadState,DEAD:DeadState},
 
-    ChangeState: {RIGHT_UP: ChangeState, LEFT_UP: ChangeState, LEFT_DOWN: ChangeState, RIGHT_DOWN: ChangeState, SHIFT_DOWN: ChangeState, SHIFT_UP: ChangeState , LANDING:ChangeState, LANDING_MOVE:ChangeState, FALL:ChangeState, CHANGE:ChangeState, GROW_TIMER:IdleState,DEAD:DeadState}
+    ChangeState: {RIGHT_UP: ChangeState, LEFT_UP: ChangeState, LEFT_DOWN: ChangeState, RIGHT_DOWN: ChangeState,SPACE: ChangeState, SHIFT_DOWN: ChangeState, SHIFT_UP: ChangeState , LANDING:ChangeState, LANDING_MOVE:ChangeState, FALL:ChangeState, CHANGE:ChangeState, GROW_TIMER:IdleState,DEAD:DeadState}
 }
 
 class Mario:
@@ -339,7 +367,17 @@ class Mario:
         self.state = Idle
         self.distance = 32
         self.mario = MARIO #마리오의 상태 (작은,슈퍼,파이어)
-        self.image = load_image('player_Mario.png')
+        if self.mario== MARIO:
+            self.image = load_image('player_Mario.png')
+            self.sizeY = 32
+        if self.mario== SUPER:
+            self.image = load_image('Super_mario.png')
+            self.y +=16
+            self.sizeY = 64
+        if self.mario== FIREMARIO:
+            self.image = load_image('Fire_mario.png')
+            self.y += 16
+            self.sizeY = 64
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
         self.collcnt = 0
@@ -351,7 +389,6 @@ class Mario:
         self.cur_state = IdleState
         self.cur_state.enter(self, None)
         self.sizeX = 32
-        self.sizeY = 32
         self.accel = ACCEL
         self.charge = CHARGE_POWER
         self.jumpOn = False
@@ -370,13 +407,16 @@ class Mario:
         self.dead = False
         self.catchY = self.y
         self.hitY = self.y
+        self.fire_list = []
     def get_bb(self):
         return self.x - (self.sizeX/2) + 5,self.y - (self.sizeY/2), self.x - 5+ (self.sizeX/2),self.y + (self.sizeY/2)
 
-
     def fire_ball(self):
 
-        pass
+        if self.mario == FIREMARIO:
+            fire_ball = Fire(self.x, self.y, self.dir)
+            game_world.add_object(fire_ball, 1)
+
 
     def move(self):
         if (self.accel > -MAX_ACCEL and self.accel< MAX_ACCEL):
@@ -399,7 +439,7 @@ class Mario:
         self.event_que.insert(0, event)
 
     def update(self):
-
+        print(server.life)
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()
@@ -422,6 +462,12 @@ class Mario:
                 server.item.remove(item)
                 game_world.remove_object(item)
                 if self.mario == MARIO:
+                    self.add_event(CHANGE)
+        for flower in server.flower:
+            if collide(self,flower):
+                server.flower.remove(flower)
+                game_world.remove_object(flower)
+                if self.mario == SUPER:
                     self.add_event(CHANGE)
 
         for gumba in server.gumba:
@@ -471,13 +517,14 @@ class Mario:
 
 
         if self.y < 0:
+            server.life -=1
             self.gameEnd = True
 
     def draw(self):
         self.cur_state.draw(self)
 
         #fill here
-        debug_print('x: ' + str(self.x+self.scrollX)+ 'y: ' + str(self.y) )
+        debug_print('x: ' + str(self.mario)+ 'y: ' + str(self.event_que) )
 
 
 
@@ -485,12 +532,7 @@ class Mario:
         if (event.type, event.key) in key_event_table and not self.dead:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_g:
-            if self.mario == MARIO:
-                self.add_event(CHANGE)
-            if self.mario == SUPER:
-                self.dmg = True
-                self.add_event(CHANGE)
+
     def setX(self):
         self.y -= 5
 
@@ -504,6 +546,7 @@ class Mario:
         else:
 
             self.isColl = True
+
 
 
 

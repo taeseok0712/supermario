@@ -6,6 +6,10 @@ ui = None
 coin = []
 gumba = []
 turtle = []
+flower = []
+Flag = False
+life = None
+cupa = []
 def clear():
     global mario
     global blocks
@@ -14,10 +18,16 @@ def clear():
     global coin
     global gumba
     global turtle
-    mario = None
+    global flower
+    global Flag
+    global cupa
+    cupa = None
     blocks = []
     item = []
     ui = None
     coin = []
     gumba = []
     turtle = []
+    flower = []
+    mario = None
+    Flag = False
