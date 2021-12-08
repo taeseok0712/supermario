@@ -98,15 +98,13 @@ def update():
             game_world.remove_object(coin)
 
     if server.mario != None:
-        if (server.ui.time < 0 or server.mario.gameEnd) and server.life > 0:
+        if (server.ui.time < 0 or server.mario.gameEnd) :
             game_framework.change_state(load_state)
     if server.mario != None:
         if server.mario.scrollX + server.mario.x > 6550 and server.mario != None:
             flag = True
             game_framework.change_state(load_state)
             server.stage = 2
-    if server.life < 0:
-        game_framework.change_state(title_state)
 
 
 

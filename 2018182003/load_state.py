@@ -5,7 +5,7 @@ import server
 from ui import C_UI_
 import game_world
 import stage2
-
+import title_state
 
 
 font = None
@@ -19,7 +19,9 @@ def enter():
     global image
     global timer
     global font
-    image = load_image('load.png')
+    if server.life > 0:
+        image = load_image('load.png')
+    else: image = load_image('gameover.png')
     font = load_font('ENCR10B.TTF', 32)
     server.ui = C_UI_()
     timer = 500
@@ -41,16 +43,19 @@ def handle_events():
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 game_framework.quit()
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
-                game_framework.change_state(main_state)
+
+
 
 
 def draw():
     clear_canvas()
-    image.draw(400, 300,800,600 )
-    for game_object in game_world.all_objects():
-        game_object.draw()
-    font.draw(425, 310, str(server.life), (255, 255, 255))
+    if server.life > 0:
+        image.draw(400, 300,800,600 )
+        for game_object in game_world.all_objects():
+            game_object.draw()
+        font.draw(425, 310, str(server.life), (255, 255, 255))
+    else:
+        image.draw(400, 300, 800, 600)
     update_canvas()
 
 
@@ -62,13 +67,15 @@ def draw():
 def update():
     global  timer
     timer -= 1
-    if timer < 0:
+    if timer < 0 and server.life > 0:
         if server.stage == 1:
             game_framework.change_state(main_state)
         elif server.stage == 2:
             game_framework.change_state(stage2)
         elif server.stage == 3:
             game_framework.change_state(main_state)
+    if timer < 0 and server.life <= 0:
+        game_framework.change_state(title_state)
 
 
 
